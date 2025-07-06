@@ -5,17 +5,166 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Perfil ID1</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 2rem; background: #f0f0f0; }
-    .card { background: white; padding: 2rem; margin: auto; max-width: 600px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h1 { margin-bottom: 1rem; }
-    p { margin: 0.5rem 0; }
+    /* Estilos básicos para a página de perfil */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2rem;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+    .card {
+      background: white;
+      padding: 2rem;
+      margin: auto;
+      max-width: 600px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 90%; /* Responsividade básica */
+    }
+    h1 {
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    p {
+      margin: 0.5rem 0;
+      color: #555;
+    }
+    strong {
+        color: #0c0c0c;
+    }
+    #logoutBtn {
+      background: #dc3545; /* Vermelho para sair */
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    #logoutBtn:hover {
+      background-color: #c82333;
+    }
+    #loadingMessage, #errorMessage {
+        font-style: italic;
+        color: #555;
+        margin-top: 1rem;
+    }
+    #errorMessage {
+        color: red;
+    }
+    #profileContent {
+        display: none; /* Esconde o conteúdo até o usuário ser verificado */
+    }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>🌟 Perfil Evoluzion</h1>
-    <p>Aqui você poderá visualizar seus dados, documentos e acessar sua carteira digital.</p>
-    <p>Mais recursos estarão disponíveis em breve.</p>
+    <p id="loadingMessage">Carregando dados do perfil...</p>
+    <p id="errorMessage" style="display: none;"></p>
+
+    <div id="profileContent">
+        <p>Bem-vindo(a), <strong id="userName"></strong>!</p>
+        <p>E-mail: <strong id="userEmail"></strong></p>
+        <p>Aqui você poderá visualizar seus dados, documentos e acessar sua carteira digital.</p>
+        <p>Mais recursos estarão disponíveis em breve.</p>
+        <button id="logoutBtn">Sair</button>
+    </div>
   </div>
+
+  <script type="module">
+    // Importações do Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Sua configuração do Firebase (deve ser a mesma do index.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk", // CONSIDERE USAR VARIÁVEIS DE AMBIENTE AQUI
+      authDomain: "evoluzion-id1.firebaseapp.com",
+      projectId: "evoluzion-id1",
+      storageBucket: "evoluzion-id1.appspot.com",
+      messagingSenderId: "413091065593",
+      appId: "1:413091065593:web:3527d66e02a2bf2f767c28"
+    };
+
+    // Inicializa o Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const userNameElem = document.getElementById("userName");
+      const userEmailElem = document.getElementById("userEmail");
+      const logoutBtn = document.getElementById("logoutBtn");
+      const loadingMessage = document.getElementById("loadingMessage");
+      const errorMessage = document.getElementById("errorMessage");
+      const profileContent = document.getElementById("profileContent");
+
+      // Função para exibir mensagem de erro
+      function showErrorMessage(message) {
+          loadingMessage.style.display = 'none';
+          profileContent.style.display = 'none';
+          errorMessage.innerText = message;
+          errorMessage.style.display = 'block';
+      }
+
+      // Event Listener para o botão de Sair
+      logoutBtn.addEventListener("click", async () => {
+        try {
+          await signOut(auth);
+          window.location.href = "./index.html"; // Redireciona para a página de login
+        } catch (error) {
+          console.error("Erro ao fazer logout:", error);
+          showErrorMessage("Erro ao fazer logout. Tente novamente.");
+        }
+      });
+
+      // Listener para o estado de autenticação do Firebase
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          // Usuário está logado
+          loadingMessage.style.display = 'none'; // Esconde a mensagem de carregamento
+          errorMessage.style.display = 'none'; // Esconde qualquer mensagem de erro
+          profileContent.style.display = 'block'; // Mostra o conteúdo do perfil
+
+          userNameElem.innerText = user.displayName || "Nome não disponível";
+          userEmailElem.innerText = user.email || "E-mail não disponível";
+
+          // Opcional: Buscar dados adicionais do usuário no Firestore
+          try {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+              const userData = userSnap.data();
+              console.log("Dados do usuário no Firestore:", userData);
+              // Você pode exibir outros dados do usuário aqui, por exemplo:
+              // const userCreatedAtElem = document.createElement('p');
+              // userCreatedAtElem.innerText = `Criado em: ${new Date(userData.createdAt.toDate()).toLocaleDateString()}`;
+              // profileContent.appendChild(userCreatedAtElem);
+            } else {
+              console.log("Documento do usuário não encontrado no Firestore.");
+            }
+          } catch (firestoreError) {
+            console.error("Erro ao buscar dados do Firestore:", firestoreError);
+            showErrorMessage("Erro ao carregar dados adicionais do perfil.");
+          }
+
+        } else {
+          // Usuário não está logado, redirecionar ou mostrar mensagem
+          console.log("Usuário não logado. Redirecionando para a página inicial.");
+          alert("Você precisa estar logado para acessar esta página.");
+          window.location.href = "./index.html";
+        }
+      });
+    });
+  </script>
 </body>
 </html>
