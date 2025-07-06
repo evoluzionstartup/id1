@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Carteira ID1 | Evoluzion</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carteira Digital | TVT</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
@@ -21,70 +19,67 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
 
-    const userName = document.getElementById("userName");
-    const email = document.getElementById("userEmail");
-    const tvt = document.getElementById("tvt");
-    const tvdt = document.getElementById("tvdt");
-    const fileInput = document.getElementById("fileUpload");
-    const docList = document.getElementById("docList");
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          userName.textContent = docSnap.data().name;
-          email.textContent = docSnap.data().email;
-        }
-
-        // Simulação de valores TVT/TVDT
-        tvt.textContent = "TVT: 33.290 dias restantes";
-        tvdt.textContent = "TVDT: 1.947 horas destinadas às telas";
-
-        fileInput.addEventListener("change", async (e) => {
-          const file = e.target.files[0];
-          const storageRef = ref(storage, `users/${user.uid}/${file.name}`);
-          await uploadBytes(storageRef, file);
-          const url = await getDownloadURL(storageRef);
-          const li = document.createElement("li");
-          li.innerHTML = `<a href="${url}" target="_blank">${file.name}</a>`;
-          docList.appendChild(li);
-        });
-      } else {
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
         window.location.href = "index.html";
+      } else {
+        document.getElementById("userInfo").textContent = `Bem-vindo, ${user.displayName}`;
       }
     });
+
+    document.getElementById("btnLogout").addEventListener("click", () => {
+      signOut(auth).then(() => window.location.href = "index.html");
+    });
   </script>
+
   <style>
-    body { font-family: Arial, sans-serif; background: #e8f0fe; padding: 2rem; text-align: center; }
-    header { margin-bottom: 2rem; }
-    .ampulheta { font-size: 1.2rem; margin: 1rem 0; }
-    .docs { margin-top: 2rem; }
-    input[type="file"] { margin-top: 1rem; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 0.5rem 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      text-align: center;
+      padding: 2rem;
+    }
+    h1 { color: #333; }
+    .ampulheta {
+      margin: 2rem auto;
+      width: 120px;
+      height: 120px;
+      border: 8px solid #333;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      background: white;
+    }
+    .buttons {
+      margin-top: 2rem;
+    }
+    button {
+      padding: 0.6rem 1rem;
+      margin: 0.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #0c0c0c;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Minha Identidade Digital</h1>
-    <p><strong>Nome:</strong> <span id="userName"></span></p>
-    <p><strong>Email:</strong> <span id="userEmail"></span></p>
-  </header>
+  <h1>Carteira Digital Evoluzion</h1>
+  <p id="userInfo">Verificando identidade...</p>
 
-  <section class="ampulheta">
-    <h2>Ampulheta da Vida</h2>
-    <p id="tvt"></p>
-    <p id="tvdt"></p>
-  </section>
+  <div class="ampulheta">TVT</div>
+  <p>Tempo de Vida: <strong>45.089 dias</strong></p>
+  <p>TVDT acumulado: <strong>1.204 horas</strong></p>
 
-  <section class="docs">
-    <h2>Meus Documentos</h2>
-    <input type="file" id="fileUpload" accept="image/*,application/pdf" />
-    <ul id="docList"></ul>
-  </section>
+  <div class="buttons">
+    <button onclick="alert('Upload de documentos em breve')">📁 Meus Documentos</button>
+    <button onclick="alert('Acessando Harmonix...')">🌐 Ir para Harmonix</button>
+    <button onclick="alert('Acessando MapEN...')">🗺️ Acessar MapEN</button>
+    <button id="btnLogout">🚪 Sair</button>
+  </div>
 </body>
 </html>
