@@ -1,93 +1,97 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ID1.Space | Login Universal Evoluzion</title>
-    <script type="module">
-      // Importando Firebase
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-      import {
-        getAuth,
-        signInWithEmailAndPassword,
-        signInWithPopup,
-        GoogleAuthProvider
-      } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ID1.Space - Login Universal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0a0a0a;
+      color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    button {
+      background-color: #1e90ff;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px;
+    }
+    p {
+      margin: 8px;
+    }
+  </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, doc, setDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
-        authDomain: "evoluzion-id1.firebaseapp.com",
-        projectId: "evoluzion-id1",
-        storageBucket: "evoluzion-id1.firebasestorage.app",
-        messagingSenderId: "413091065593",
-        appId: "1:413091065593:web:3527d66e02a2bf2f767c28"
-      };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
+      authDomain: "evoluzion-id1.firebaseapp.com",
+      projectId: "evoluzion-id1",
+      storageBucket: "evoluzion-id1.appspot.com",
+      messagingSenderId: "413091065593",
+      appId: "1:413091065593:web:3527d66e02a2bf2f767c28"
+    };
 
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-      window.loginEmailPassword = async () => {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-          alert("Login bem-sucedido!");
-          window.location.href = "https://perfil.space";
-        } catch (error) {
-          alert("Erro: " + error.message);
+    async function signInWithGoogle() {
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          await setDoc(userRef, {
+            name: user.displayName,
+            email: user.email,
+            createdAt: new Date().toISOString()
+          });
         }
-      };
 
-      window.loginGoogle = async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-          await signInWithPopup(auth, provider);
-          alert("Login com Google bem-sucedido!");
-          window.location.href = "https://perfil.space";
-        } catch (error) {
-          alert("Erro: " + error.message);
-        }
-      };
-    </script>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: linear-gradient(to right, #1c1c1c, #343434);
-        color: #fff;
-        text-align: center;
-        padding-top: 50px;
+        document.getElementById("status").innerText = `Olá, ${user.displayName}`;
+        countUsers();
+      } catch (error) {
+        console.error("Erro no login:", error);
       }
-      input {
-        padding: 10px;
-        margin: 10px;
-        width: 250px;
-        border-radius: 5px;
-        border: none;
-      }
-      button {
-        padding: 10px 20px;
-        margin: 10px;
-        border: none;
-        background-color: #00ffb3;
-        color: #000;
-        font-weight: bold;
-        cursor: pointer;
-        border-radius: 5px;
-      }
-      a {
-        color: #00ffb3;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Bem-vindo ao ID1.Space</h1>
-    <p>Seu portal de acesso à identidade digital da Evol.U.Zion</p>
+    }
 
-    <input type="email" id="email" placeholder="Email" /><br />
-    <input type="password" id="password" placeholder="Senha" /><br />
-    <button onclick="loginEmailPassword()">Entrar com Email</button>
-    <button onclick="loginGoogle()">Entrar com Google</button>
+    async function countUsers() {
+      const querySnapshot = await getDocs(collection(db, "users"));
+      const total = querySnapshot.size;
+      document.getElementById("userCount").innerText = `Usuários registrados: ${total}`;
+    }
 
-    <p><a href="https://perfil.space">Ajustar perfil em perfil.space</a></p>
-  </body>
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById("status").innerText = `Logado como ${user.displayName}`;
+        countUsers();
+      }
+    });
+
+    window.signInWithGoogle = signInWithGoogle;
+  </script>
+</head>
+<body>
+  <h1>ID1.Space</h1>
+  <p>Identidade Universal da Evol.U.Zion</p>
+  <button onclick="signInWithGoogle()">Entrar com Google</button>
+  <p id="status">Você não está logado</p>
+  <p id="userCount">Usuários registrados: 0</p>
+</body>
 </html>
