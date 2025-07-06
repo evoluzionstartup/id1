@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ID1 | Login Universal</title>
+  <title>ID1 | Identidade Digital Evoluzion</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
@@ -22,68 +22,77 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const loginBtn = document.getElementById("loginGoogle");
-    const statusText = document.getElementById("status");
-    const userCountText = document.getElementById("userCount");
+    document.addEventListener("DOMContentLoaded", () => {
+      const loginBtn = document.getElementById("loginGoogle");
+      const statusText = document.getElementById("status");
+      const userCountText = document.getElementById("userCount");
 
-    loginBtn.addEventListener("click", async () => {
-      const provider = new GoogleAuthProvider();
-      try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
+      loginBtn.addEventListener("click", async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+          const result = await signInWithPopup(auth, provider);
+          const user = result.user;
 
-        const userRef = doc(db, "users", user.uid);
-        const snap = await getDoc(userRef);
-        if (!snap.exists()) {
-          await setDoc(userRef, {
-            uid: user.uid,
-            name: user.displayName,
-            email: user.email,
-            createdAt: new Date()
-          });
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+          if (!userSnap.exists()) {
+            await setDoc(userRef, {
+              uid: user.uid,
+              name: user.displayName,
+              email: user.email,
+              createdAt: new Date()
+            });
+          }
+
+          window.location.href = "./perfil.html";
+        } catch (error) {
+          console.error("Erro no login:", error);
+          statusText.innerText = "Erro ao logar. Tente novamente.";
         }
+      });
 
-        window.location.href = "perfil.html";
-      } catch (error) {
-        console.error(error);
-        statusText.textContent = "Erro ao logar. Tente novamente.";
+      async function updateUserCount() {
+        const coll = collection(db, "users");
+        const snapshot = await getCountFromServer(coll);
+        userCountText.innerText = `Total de usuários ID1: ${snapshot.data().count}`;
       }
-    });
 
-    async function updateUserCount() {
-      const coll = collection(db, "users");
-      const snapshot = await getCountFromServer(coll);
-      userCountText.innerText = `Total de usuários ID1: ${snapshot.data().count}`;
-    }
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) updateUserCount();
+      auth.onAuthStateChanged((user) => {
+        if (user) updateUserCount();
+      });
     });
   </script>
-
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: white;
-      text-align: center;
-      padding: 2rem;
-    }
-    button {
-      padding: 0.7rem 1.2rem;
-      border: none;
-      border-radius: 8px;
-      background: #f5f5f5;
-      color: #111;
-      font-size: 1rem;
-      cursor: pointer;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; text-align: center; background: #f5f5f5; }
+    header { background: #0c0c0c; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { margin: 0; font-size: 1.5rem; }
+    header button { background: white; color: black; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
+    main { padding: 2rem; }
+    .mapa { width: 100%; max-width: 600px; margin: auto; background: #ddd; padding: 2rem; border-radius: 1rem; }
+    footer { background: #0c0c0c; color: white; padding: 1rem; margin-top: 2rem; }
   </style>
 </head>
 <body>
-  <h1>ID1 • Login Universal Evoluzion</h1>
-  <p id="status"></p>
-  <button id="loginGoogle">Entrar com Google</button>
-  <p id="userCount">Total de usuários ID1: carregando...</p>
+  <header>
+    <h1>ID1: Identidade Digital Evoluzion</h1>
+    <button id="loginGoogle">Login com Google</button>
+  </header>
+
+  <main>
+    <h2>🌍 Bem-vindo à identidade digital universal</h2>
+    <p>Uma só identidade. Um só planeta. Um só povo.</p>
+    <p id="status"></p>
+    <p id="userCount">Total de usuários ID1: carregando...</p>
+
+    <div class="mapa">
+      <h3>Mapa Mundial Interativo (em breve)</h3>
+      <p>Aqui você poderá ver o número de usuários por país e acessar documentos oficiais de cada nação.</p>
+      <p>🔒 Seus dados são protegidos e pertencem apenas a você.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Evoluzion. Todos os direitos reservados.</p>
+  </footer>
 </body>
 </html>
