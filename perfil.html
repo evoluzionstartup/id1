@@ -3,83 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Carteira Digital | TVT</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
-      authDomain: "evoluzion-id1.firebaseapp.com",
-      projectId: "evoluzion-id1",
-      storageBucket: "evoluzion-id1.appspot.com",
-      messagingSenderId: "413091065593",
-      appId: "1:413091065593:web:3527d66e02a2bf2f767c28"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-      } else {
-        document.getElementById("userInfo").textContent = `Bem-vindo, ${user.displayName}`;
-      }
-    });
-
-    document.getElementById("btnLogout").addEventListener("click", () => {
-      signOut(auth).then(() => window.location.href = "index.html");
-    });
-  </script>
-
+  <title>Perfil ID1</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      text-align: center;
-      padding: 2rem;
-    }
-    h1 { color: #333; }
-    .ampulheta {
-      margin: 2rem auto;
-      width: 120px;
-      height: 120px;
-      border: 8px solid #333;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.5rem;
-      background: white;
-    }
-    .buttons {
-      margin-top: 2rem;
-    }
-    button {
-      padding: 0.6rem 1rem;
-      margin: 0.5rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background-color: #0c0c0c;
-      color: white;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; padding: 2rem; background: #f0f0f0; }
+    .card { background: white; padding: 2rem; margin: auto; max-width: 600px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h1 { margin-bottom: 1rem; }
+    p { margin: 0.5rem 0; }
   </style>
 </head>
 <body>
-  <h1>Carteira Digital Evoluzion</h1>
-  <p id="userInfo">Verificando identidade...</p>
-
-  <div class="ampulheta">TVT</div>
-  <p>Tempo de Vida: <strong>45.089 dias</strong></p>
-  <p>TVDT acumulado: <strong>1.204 horas</strong></p>
-
-  <div class="buttons">
-    <button onclick="alert('Upload de documentos em breve')">📁 Meus Documentos</button>
-    <button onclick="alert('Acessando Harmonix...')">🌐 Ir para Harmonix</button>
-    <button onclick="alert('Acessando MapEN...')">🗺️ Acessar MapEN</button>
-    <button id="btnLogout">🚪 Sair</button>
+  <div class="card">
+    <h1>🌟 Perfil Evoluzion</h1>
+    <p>Aqui você poderá visualizar seus dados, documentos e acessar sua carteira digital.</p>
+    <p>Mais recursos estarão disponíveis em breve.</p>
   </div>
 </body>
 </html>
