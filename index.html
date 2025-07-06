@@ -1,13 +1,47 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ID1 | Identidade Digital Evoluzion</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ID1: Identidade Digital Evoluzion</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width:600px; margin:auto; padding:2rem; text-align:center; }
+    #loginGoogle { padding:0.8rem 1.2rem; font-size:1rem; background:#0055aa; color:#fff; border:none; border-radius:5px; cursor:pointer; }
+    #status, #userCount { margin-top:1rem; }
+  </style>
+</head>
+<body>
+  <h1>ID1: Identidade Digital Evoluzion</h1>
+  <p>Bem-vindo à identidade digital universal</p>
+  <button id="loginGoogle">Login com Google</button>
+  <p id="status"></p>
+  <p id="userCount">Total de usuários ID1: carregando...</p>
+
+  <h2>Mapa Mundial Interativo (em breve)</h2>
+  <p>
+    Aqui você poderá ver o número de usuários por país e acessar documentos oficiais de cada nação.
+  </p>
+
+  <footer>
+    <p>© 2025 Evoluzion. Todos os direitos reservados.</p>
+  </footer>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithPopup,
+      GoogleAuthProvider
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      collection,
+      getCountFromServer
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
@@ -22,11 +56,11 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const loginBtn = document.getElementById("loginGoogle");
+    const loginButton = document.getElementById("loginGoogle");
     const statusText = document.getElementById("status");
     const userCountText = document.getElementById("userCount");
 
-    loginBtn.addEventListener("click", async () => {
+    loginButton.addEventListener("click", async () => {
       const provider = new GoogleAuthProvider();
       try {
         const result = await signInWithPopup(auth, provider);
@@ -42,10 +76,11 @@
             createdAt: new Date()
           });
         }
+
         window.location.href = "perfil.html";
       } catch (error) {
         console.error("Erro no login:", error);
-        statusText.innerText = "Erro ao logar. Tente novamente.";
+        statusText.innerText = "Erro ao fazer login. Tente novamente.";
       }
     });
 
@@ -55,41 +90,14 @@
       userCountText.innerText = `Total de usuários ID1: ${snapshot.data().count}`;
     }
 
-    onAuthStateChanged(auth, async (user) => {
-      if (user) updateUserCount();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        updateUserCount();
+      }
     });
+
+    // Atualiza contador assim que a página carrega
+    updateUserCount();
   </script>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; text-align: center; background: #f5f5f5; }
-    header { background: #0c0c0c; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
-    header h1 { margin: 0; font-size: 1.5rem; }
-    header button { background: white; color: black; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
-    main { padding: 2rem; }
-    .mapa { width: 100%; max-width: 600px; margin: auto; background: #ddd; padding: 2rem; border-radius: 1rem; }
-    footer { background: #0c0c0c; color: white; padding: 1rem; margin-top: 2rem; }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>ID1: Identidade Digital Evoluzion</h1>
-    <button id="loginGoogle">Login com Google</button>
-  </header>
-
-  <main>
-    <h2>🌍 Bem-vindo à identidade digital universal</h2>
-    <p>Uma só identidade. Um só planeta. Um só povo.</p>
-    <p id="status"></p>
-    <p id="userCount">Total de usuários ID1: carregando...</p>
-
-    <div class="mapa">
-      <h3>Mapa Mundial Interativo (em breve)</h3>
-      <p>Aqui você poderá ver o número de usuários por país e acessar documentos oficiais de cada nação.</p>
-      <p>🔒 Seus dados são protegidos e pertencem apenas a você.</p>
-    </div>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 Evoluzion. Todos os direitos reservados.</p>
-  </footer>
 </body>
 </html>
