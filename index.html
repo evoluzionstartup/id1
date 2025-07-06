@@ -4,72 +4,82 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ID1 | Identidade Digital Evoluzion</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
-      authDomain: "evoluzion-id1.firebaseapp.com",
-      projectId: "evoluzion-id1",
-      storageBucket: "evoluzion-id1.appspot.com",
-      messagingSenderId: "413091065593",
-      appId: "1:413091065593:web:3527d66e02a2bf2f767c28"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const loginBtn = document.getElementById("loginGoogle");
-      const statusText = document.getElementById("status");
-      const userCountText = document.getElementById("userCount");
-
-      loginBtn.addEventListener("click", async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-          const result = await signInWithPopup(auth, provider);
-          const user = result.user;
-
-          const userRef = doc(db, "users", user.uid);
-          const userSnap = await getDoc(userRef);
-          if (!userSnap.exists()) {
-            await setDoc(userRef, {
-              uid: user.uid,
-              name: user.displayName,
-              email: user.email,
-              createdAt: new Date()
-            });
-          }
-
-          window.location.href = "./perfil.html";
-        } catch (error) {
-          console.error("Erro no login:", error);
-          statusText.innerText = "Erro ao logar. Tente novamente.";
-        }
-      });
-
-      async function updateUserCount() {
-        const coll = collection(db, "users");
-        const snapshot = await getCountFromServer(coll);
-        userCountText.innerText = `Total de usuários ID1: ${snapshot.data().count}`;
-      }
-
-      auth.onAuthStateChanged((user) => {
-        if (user) updateUserCount();
-      });
-    });
-  </script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; text-align: center; background: #f5f5f5; }
-    header { background: #0c0c0c; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
-    header h1 { margin: 0; font-size: 1.5rem; }
-    header button { background: white; color: black; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
-    main { padding: 2rem; }
-    .mapa { width: 100%; max-width: 600px; margin: auto; background: #ddd; padding: 2rem; border-radius: 1rem; }
-    footer { background: #0c0c0c; color: white; padding: 1rem; margin-top: 2rem; }
+    /* Estilos básicos para a página */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      background: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh; /* Garante que o footer fique no final da página */
+    }
+    header {
+      background: #0c0c0c;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap; /* Permite que os itens quebrem a linha em telas menores */
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    header button {
+      background: white;
+      color: black;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    header button:hover {
+      background-color: #e0e0e0;
+    }
+    header button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+    main {
+      padding: 2rem;
+      flex-grow: 1; /* Faz o conteúdo principal ocupar o espaço restante */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .mapa {
+      width: 100%;
+      max-width: 600px;
+      margin: 2rem auto;
+      background: #ddd;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    footer {
+      background: #0c0c0c;
+      color: white;
+      padding: 1rem;
+      margin-top: auto; /* Empurra o footer para o final */
+      width: 100%;
+    }
+    #status {
+      margin-top: 1rem;
+      color: red; /* Para mensagens de erro */
+      font-weight: bold;
+    }
+    #userCount {
+        margin-top: 1rem;
+        font-size: 1.1rem;
+        color: #333;
+    }
   </style>
 </head>
 <body>
@@ -94,5 +104,123 @@
   <footer>
     <p>&copy; 2025 Evoluzion. Todos os direitos reservados.</p>
   </footer>
+
+  <script type="module">
+    // Importações do Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Sua configuração do Firebase (substitua com suas variáveis de ambiente em produção)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk", // CONSIDERE USAR VARIÁVEIS DE AMBIENTE AQUI
+      authDomain: "evoluzion-id1.firebaseapp.com",
+      projectId: "evoluzion-id1",
+      storageBucket: "evoluzion-id1.appspot.com",
+      messagingSenderId: "413091065593",
+      appId: "1:413091065593:web:3527d66e02a2bf2f767c28"
+    };
+
+    // Inicializa o Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const loginBtn = document.getElementById("loginGoogle");
+      const statusText = document.getElementById("status");
+      const userCountText = document.getElementById("userCount");
+
+      // Função para atualizar a contagem de usuários
+      async function updateUserCount() {
+        try {
+          userCountText.innerText = "Total de usuários ID1: carregando...";
+          const coll = collection(db, "users");
+          const snapshot = await getCountFromServer(coll);
+          userCountText.innerText = `Total de usuários ID1: ${snapshot.data().count}`;
+        } catch (error) {
+          console.error("Erro ao obter contagem de usuários:", error);
+          userCountText.innerText = "Erro ao carregar contagem de usuários.";
+        }
+      }
+
+      // Event Listener para o botão de Login com Google
+      loginBtn.addEventListener("click", async () => {
+        const provider = new GoogleAuthProvider();
+        loginBtn.disabled = true; // Desabilita o botão para evitar múltiplos cliques
+        statusText.innerText = "Redirecionando para o login..."; // Mensagem de status
+
+        try {
+          const result = await signInWithPopup(auth, provider);
+          const user = result.user;
+
+          // Referência ao documento do usuário no Firestore
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+
+          // Se o documento do usuário não existir, crie-o
+          if (!userSnap.exists()) {
+            await setDoc(userRef, {
+              uid: user.uid,
+              name: user.displayName,
+              email: user.email,
+              createdAt: new Date(),
+              lastLoginAt: new Date() // Adiciona o timestamp do último login
+            });
+          } else {
+            // Se o usuário já existe, apenas atualiza o timestamp do último login
+            await setDoc(userRef, { lastLoginAt: new Date() }, { merge: true });
+          }
+
+          // Redireciona para a página de perfil após o login bem-sucedido
+          window.location.href = "./perfil.html";
+
+        } catch (error) {
+          console.error("Erro no login:", error);
+          let errorMessage = "Erro ao logar. Tente novamente.";
+
+          // Tratamento de erros específicos do Firebase Auth
+          switch (error.code) {
+            case 'auth/popup-closed-by-user':
+              errorMessage = "Login cancelado. A janela pop-up foi fechada.";
+              break;
+            case 'auth/cancelled-popup-request':
+              errorMessage = "A solicitação de pop-up já está em andamento ou foi cancelada.";
+              break;
+            case 'auth/account-exists-with-different-credential':
+              errorMessage = "Uma conta com este e-mail já existe com credenciais diferentes.";
+              break;
+            case 'auth/unauthorized-domain':
+              errorMessage = "Domínio não autorizado para autenticação. Verifique as configurações do Firebase.";
+              break;
+            default:
+              errorMessage = `Erro desconhecido: ${error.message}`;
+              break;
+          }
+          statusText.innerText = errorMessage;
+          loginBtn.disabled = false; // Reabilita o botão em caso de erro
+        }
+      });
+
+      // Listener para o estado de autenticação do Firebase
+      // Garante que a contagem de usuários seja atualizada no carregamento inicial
+      // e em qualquer mudança de estado (login/logout)
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // Usuário logado
+          console.log("Usuário logado no index:", user.displayName);
+          loginBtn.innerText = "Ir para Perfil";
+          loginBtn.onclick = () => window.location.href = "./perfil.html"; // Muda a ação do botão
+        } else {
+          // Usuário não logado
+          console.log("Usuário não logado no index.");
+          loginBtn.innerText = "Login com Google";
+          loginBtn.onclick = null; // Remove a ação de ir para perfil, volta para o padrão do event listener
+          loginBtn.addEventListener("click", () => { /* re-add original behavior if needed */ });
+        }
+        updateUserCount(); // Sempre atualiza a contagem quando o estado muda (ou no carregamento)
+      });
+    });
+  </script>
 </body>
 </html>
