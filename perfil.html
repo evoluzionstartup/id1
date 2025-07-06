@@ -1,122 +1,90 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meu Perfil ID1</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Carteira ID1 | Evoluzion</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
+      authDomain: "evoluzion-id1.firebaseapp.com",
+      projectId: "evoluzion-id1",
+      storageBucket: "evoluzion-id1.appspot.com",
+      messagingSenderId: "413091065593",
+      appId: "1:413091065593:web:3527d66e02a2bf2f767c28"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    const userName = document.getElementById("userName");
+    const email = document.getElementById("userEmail");
+    const tvt = document.getElementById("tvt");
+    const tvdt = document.getElementById("tvdt");
+    const fileInput = document.getElementById("fileUpload");
+    const docList = document.getElementById("docList");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          userName.textContent = docSnap.data().name;
+          email.textContent = docSnap.data().email;
+        }
+
+        // Simulação de valores TVT/TVDT
+        tvt.textContent = "TVT: 33.290 dias restantes";
+        tvdt.textContent = "TVDT: 1.947 horas destinadas às telas";
+
+        fileInput.addEventListener("change", async (e) => {
+          const file = e.target.files[0];
+          const storageRef = ref(storage, `users/${user.uid}/${file.name}`);
+          await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(storageRef);
+          const li = document.createElement("li");
+          li.innerHTML = `<a href="${url}" target="_blank">${file.name}</a>`;
+          docList.appendChild(li);
+        });
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f3f3f3;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #222;
-      color: #fff;
-      padding: 1rem;
-      text-align: center;
-    }
-    .container {
-      max-width: 900px;
-      margin: 2rem auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      margin-top: 0;
-    }
-    .profile-info, .documents {
-      margin-top: 2rem;
-    }
-    label {
-      display: block;
-      margin-top: 1rem;
-      font-weight: bold;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 0.6rem;
-      margin-top: 0.4rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .upload-area {
-      border: 2px dashed #aaa;
-      padding: 1rem;
-      text-align: center;
-      margin-top: 1rem;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button {
-      margin-top: 1.5rem;
-      padding: 0.7rem 1.5rem;
-      background-color: #0055aa;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+    body { font-family: Arial, sans-serif; background: #e8f0fe; padding: 2rem; text-align: center; }
+    header { margin-bottom: 2rem; }
+    .ampulheta { font-size: 1.2rem; margin: 1rem 0; }
+    .docs { margin-top: 2rem; }
+    input[type="file"] { margin-top: 1rem; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 0.5rem 0; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Identidade Digital ID1</h1>
-    <p>Bem-vindo à sua identidade soberana dentro da Evoluzion</p>
+    <h1>Minha Identidade Digital</h1>
+    <p><strong>Nome:</strong> <span id="userName"></span></p>
+    <p><strong>Email:</strong> <span id="userEmail"></span></p>
   </header>
 
-  <div class="container">
-    <section class="profile-info">
-      <h2>Dados Pessoais</h2>
-      <label for="nome">Nome completo</label>
-      <input type="text" id="nome" placeholder="Seu nome">
+  <section class="ampulheta">
+    <h2>Ampulheta da Vida</h2>
+    <p id="tvt"></p>
+    <p id="tvdt"></p>
+  </section>
 
-      <label for="nascimento">Data de nascimento</label>
-      <input type="date" id="nascimento">
-
-      <label for="cidade">Cidade onde nasceu</label>
-      <input type="text" id="cidade">
-
-      <label for="residencia">Cidade onde vive</label>
-      <input type="text" id="residencia">
-
-      <label for="biografia">Biografia</label>
-      <textarea id="biografia" rows="4" placeholder="Conte um pouco sobre você..."></textarea>
-    </section>
-
-    <section class="documents">
-      <h2>Documentos</h2>
-
-      <label>RG (foto ou número)</label>
-      <div class="upload-area" onclick="document.getElementById('rgUpload').click()">
-        Clique para enviar RG
-        <input type="file" id="rgUpload" accept="image/*,application/pdf" hidden>
-      </div>
-
-      <label>CPF (foto ou número)</label>
-      <div class="upload-area" onclick="document.getElementById('cpfUpload').click()">
-        Clique para enviar CPF
-        <input type="file" id="cpfUpload" accept="image/*,application/pdf" hidden>
-      </div>
-
-      <label>Comprovante de residência</label>
-      <div class="upload-area" onclick="document.getElementById('residenciaUpload').click()">
-        Clique para enviar comprovante
-        <input type="file" id="residenciaUpload" accept="image/*,application/pdf" hidden>
-      </div>
-
-      <button onclick="salvarPerfil()">Salvar Informações</button>
-    </section>
-  </div>
-
-  <script>
-    function salvarPerfil() {
-      alert("Informações salvas com sucesso! (Integração com Firebase em breve)");
-    }
-  </script>
+  <section class="docs">
+    <h2>Meus Documentos</h2>
+    <input type="file" id="fileUpload" accept="image/*,application/pdf" />
+    <ul id="docList"></ul>
+  </section>
 </body>
 </html>
