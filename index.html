@@ -1,59 +1,93 @@
-
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ID1 - Identidade Digital Universal</title>
-  <style>
-    body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; color: #222; line-height: 1.6; }
-    header { background: #111; color: #fff; padding: 2rem; text-align: center; }
-    header h1 { margin: 0; font-size: 2.8rem; }
-    header p { margin-top: 1rem; font-size: 1.2rem; color: #ccc; }
-    section { padding: 2rem; max-width: 900px; margin: auto; }
-    section h2 { border-bottom: 2px solid #ddd; padding-bottom: 0.5rem; margin-bottom: 1rem; }
-    footer { background: #222; color: #ccc; text-align: center; padding: 1rem; }
-    .highlight { color: #0070f3; font-weight: bold; }
-    .cta { background: #0070f3; color: white; padding: 2rem; text-align: center; margin-top: 3rem; }
-    .cta a { background: white; color: #0070f3; padding: 0.5rem 1rem; border-radius: 5px; text-decoration: none; font-weight: bold; }
-  </style>
-</head>
-<body>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ID1.Space | Login Universal Evoluzion</title>
+    <script type="module">
+      // Importando Firebase
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        signInWithPopup,
+        GoogleAuthProvider
+      } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-<header>
-  <h1>ID1</h1>
-  <p>Identidade Digital Universal para um mundo descentralizado</p>
-</header>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
+        authDomain: "evoluzion-id1.firebaseapp.com",
+        projectId: "evoluzion-id1",
+        storageBucket: "evoluzion-id1.firebasestorage.app",
+        messagingSenderId: "413091065593",
+        appId: "1:413091065593:web:3527d66e02a2bf2f767c28"
+      };
 
-<section>
-  <h2>O que é o ID1?</h2>
-  <p>O <span class="highlight">ID1</span> é a proposta da Evoluzion para criar uma Identidade Digital Universal, transparente e soberana, onde cada indivíduo controla suas informações pessoais e sua presença online.</p>
-</section>
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth();
 
-<section>
-  <h2>Características</h2>
-  <ul>
-    <li>✅ Controle total dos seus dados pessoais</li>
-    <li>✅ Verificação descentralizada e transparente</li>
-    <li>✅ Compatível com redes, apps e jogos do ecossistema Evoluzion</li>
-    <li>✅ Integração com sistemas de reputação, perfilação e avatar digital</li>
-  </ul>
-</section>
+      window.loginEmailPassword = async () => {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          alert("Login bem-sucedido!");
+          window.location.href = "https://perfil.space";
+        } catch (error) {
+          alert("Erro: " + error.message);
+        }
+      };
 
-<section>
-  <h2>Por que ID1?</h2>
-  <p>Hoje, grandes plataformas dominam a identidade dos usuários. O ID1 devolve o poder para as pessoas — sem roubo de dados, sem manipulação, sem exploração.</p>
-</section>
+      window.loginGoogle = async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+          await signInWithPopup(auth, provider);
+          alert("Login com Google bem-sucedido!");
+          window.location.href = "https://perfil.space";
+        } catch (error) {
+          alert("Erro: " + error.message);
+        }
+      };
+    </script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #1c1c1c, #343434);
+        color: #fff;
+        text-align: center;
+        padding-top: 50px;
+      }
+      input {
+        padding: 10px;
+        margin: 10px;
+        width: 250px;
+        border-radius: 5px;
+        border: none;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 10px;
+        border: none;
+        background-color: #00ffb3;
+        color: #000;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      a {
+        color: #00ffb3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Bem-vindo ao ID1.Space</h1>
+    <p>Seu portal de acesso à identidade digital da Evol.U.Zion</p>
 
-<section class="cta">
-  <h2>Entre para o Futuro da Identidade Digital</h2>
-  <p>Cadastre-se para ser um dos primeiros a testar o ID1 no Nexus.</p>
-  <a href="mailto:id1@evoluzion.space">Quero Participar</a>
-</section>
+    <input type="email" id="email" placeholder="Email" /><br />
+    <input type="password" id="password" placeholder="Senha" /><br />
+    <button onclick="loginEmailPassword()">Entrar com Email</button>
+    <button onclick="loginGoogle()">Entrar com Google</button>
 
-<footer>
-  <p>© 2025 ID1.space - Um projeto da Evoluzion</p>
-</footer>
-
-</body>
+    <p><a href="https://perfil.space">Ajustar perfil em perfil.space</a></p>
+  </body>
 </html>
