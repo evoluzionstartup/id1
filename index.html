@@ -1,47 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ID1: Identidade Digital Evoluzion</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width:600px; margin:auto; padding:2rem; text-align:center; }
-    #loginGoogle { padding:0.8rem 1.2rem; font-size:1rem; background:#0055aa; color:#fff; border:none; border-radius:5px; cursor:pointer; }
-    #status, #userCount { margin-top:1rem; }
-  </style>
-</head>
-<body>
-  <h1>ID1: Identidade Digital Evoluzion</h1>
-  <p>Bem-vindo à identidade digital universal</p>
-  <button id="loginGoogle">Login com Google</button>
-  <p id="status"></p>
-  <p id="userCount">Total de usuários ID1: carregando...</p>
-
-  <h2>Mapa Mundial Interativo (em breve)</h2>
-  <p>
-    Aqui você poderá ver o número de usuários por país e acessar documentos oficiais de cada nação.
-  </p>
-
-  <footer>
-    <p>© 2025 Evoluzion. Todos os direitos reservados.</p>
-  </footer>
-
+  <title>ID1 | Login Universal</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signInWithPopup,
-      GoogleAuthProvider
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      setDoc,
-      getDoc,
-      collection,
-      getCountFromServer
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
@@ -56,19 +22,19 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const loginButton = document.getElementById("loginGoogle");
+    const loginBtn = document.getElementById("loginGoogle");
     const statusText = document.getElementById("status");
     const userCountText = document.getElementById("userCount");
 
-    loginButton.addEventListener("click", async () => {
+    loginBtn.addEventListener("click", async () => {
       const provider = new GoogleAuthProvider();
       try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
 
         const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-        if (!userSnap.exists()) {
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) {
           await setDoc(userRef, {
             uid: user.uid,
             name: user.displayName,
@@ -79,8 +45,8 @@
 
         window.location.href = "perfil.html";
       } catch (error) {
-        console.error("Erro no login:", error);
-        statusText.innerText = "Erro ao fazer login. Tente novamente.";
+        console.error(error);
+        statusText.textContent = "Erro ao logar. Tente novamente.";
       }
     });
 
@@ -91,13 +57,33 @@
     }
 
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        updateUserCount();
-      }
+      if (user) updateUserCount();
     });
-
-    // Atualiza contador assim que a página carrega
-    updateUserCount();
   </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+    button {
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      background: #f5f5f5;
+      color: #111;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>ID1 • Login Universal Evoluzion</h1>
+  <p id="status"></p>
+  <button id="loginGoogle">Entrar com Google</button>
+  <p id="userCount">Total de usuários ID1: carregando...</p>
 </body>
 </html>
