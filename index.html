@@ -4,247 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ID1 | Identidade Digital Evoluzion</title>
-  <style>
-    /* Estilos gerais */
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      background: #f5f5f5;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    header {
-      background: #2c3e50; /* Cor mais escura para o cabeçalho */
-      color: white;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: center; /* Centraliza o título */
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    header h1 {
-      margin: 0;
-      font-size: 1.8rem;
-    }
-    main {
-      flex-grow: 1; /* Permite que o conteúdo principal ocupe o espaço restante */
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .welcome-section {
-      margin-bottom: 30px;
-    }
-    .welcome-section h2 {
-      color: #34495e;
-      font-size: 2.2rem;
-      margin-bottom: 10px;
-    }
-    .welcome-section p {
-      font-size: 1.1rem;
-      color: #555;
-    }
-    .login-card {
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 450px; /* Limita a largura do cartão de login */
-      margin: 20px auto;
-      text-align: left;
-    }
-    .login-card h3 {
-      color: #34495e;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 1.5rem;
-    }
-    .button {
-      background: #4a90e2; /* Azul vibrante */
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1.05rem;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      width: 100%;
-      box-sizing: border-box;
-      margin-bottom: 15px; /* Espaço entre botões */
-    }
-    .button:hover {
-      background-color: #357bd8;
-      transform: translateY(-2px);
-    }
-    .button-google {
-      background: #db4437; /* Vermelho Google */
-    }
-    .button-google:hover {
-      background-color: #c23321;
-    }
-    .button-anonymous {
-      background: #6c757d; /* Cinza */
-    }
-    .button-anonymous:hover {
-      background-color: #5a6268;
-    }
-    input[type="email"],
-    input[type="password"],
-    input[type="tel"],
-    input[type="text"] {
-      width: calc(100% - 22px); /* Com padding */
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-size: 1rem;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-      color: #555;
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    .status-message {
-      margin-top: 20px;
-      font-size: 1rem;
-      color: #e74c3c; /* Vermelho para erros */
-      text-align: center;
-      font-weight: bold;
-    }
-    .success-message {
-        color: #27ae60; /* Verde para sucesso */
-    }
-    #recaptcha-container {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .mapa {
-      width: 100%;
-      max-width: 600px;
-      margin: 30px auto;
-      background: #e9ecef;
-      padding: 2.5rem;
-      border-radius: 10px;
-      border: 1px solid #dee2e6;
-      text-align: center;
-    }
-    .mapa h3 {
-      color: #495057;
-    }
-    .user-count {
-      margin-top: 20px;
-      font-size: 1.1rem;
-      color: #6c757d;
-      font-weight: bold;
-    }
-    footer {
-      background: #2c3e50;
-      color: white;
-      padding: 1rem;
-      margin-top: auto; /* Empurra o footer para o final da página */
-      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>ID1: Identidade Digital Evoluzion</h1>
-  </header>
-
-  <main>
-    <section class="welcome-section">
-      <h2>🌍 Bem-vindo à identidade digital universal</h2>
-      <p>Uma só identidade. Um só planeta. Um só povo.</p>
-    </section>
-
-    <div class="login-card">
-      <h3>Entrar ou Cadastrar</h3>
-      <p id="status" class="status-message"></p>
-
-      <button id="loginGoogle" class="button button-google">Login com Google</button>
-
-      <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
-
-      <h4>E-mail e Senha</h4>
-      <div class="form-group">
-        <label for="emailInput">E-mail:</label>
-        <input type="email" id="emailInput" placeholder="seuemail@exemplo.com">
-      </div>
-      <div class="form-group">
-        <label for="passwordInput">Senha:</label>
-        <input type="password" id="passwordInput" placeholder="********">
-      </div>
-      <button id="loginEmail" class="button">Entrar com E-mail</button>
-      <button id="registerEmail" class="button">Registrar com E-mail</button>
-
-      <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
-
-      <button id="loginAnonymous" class="button button-anonymous">Entrar como Anônimo</button>
-      
-      <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
-
-      <h4>Telefone</h4>
-      <div class="form-group">
-        <label for="phoneInput">Número de Telefone:</label>
-        <input type="tel" id="phoneInput" placeholder="+55 (XX) XXXXX-XXXX">
-        <small style="color: #666;">Inclua o código do país e DDD (Ex: +5511987654321)</small>
-      </div>
-      <div id="recaptcha-container"></div>
-      <button id="sendSmsCode" class="button">Enviar Código SMS</button>
-
-      <div id="verifyCodeSection" style="display: none; margin-top: 20px;">
-        <label for="smsCodeInput">Código SMS:</label>
-        <input type="text" id="smsCodeInput" placeholder="XXXXXX">
-        <button id="verifySmsCode" class="button">Verificar Código</button>
-      </div>
-    </div>
-
-    <p id="userCount" class="user-count">Total de usuários ID1: carregando...</p>
-
-    <div class="mapa">
-      <h3>Mapa Mundial Interativo (em breve)</h3>
-      <p>Aqui você poderá ver o número de usuários por país e acessar documentos oficiais de cada nação.</p>
-      <p>🔒 Seus dados são protegidos e pertencem apenas a você.</p>
-    </div>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 Evoluzion. Todos os direitos reservados.</p>
-  </footer>
+  
+  <link rel="manifest" href="/manifest.json">
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { 
-      getAuth, 
-      signInWithPopup, 
-      GoogleAuthProvider, 
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signInAnonymously,
-      RecaptchaVerifier,
-      signInWithPhoneNumber,
-      onAuthStateChanged // Mantido, mas usado de forma diferente
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, getCountFromServer, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"; // Importado updateDoc
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // Sua configuração do Firebase (Garanta que esta é a COPIA EXATA do seu Console do Firebase)
+    // ATENÇÃO: SUBSTITUA ESTA CONFIGURAÇÃO PELA SUA CONFIGURAÇÃO REAL DO FIREBASE!
+    // Você pode encontrá-la no seu Console do Firebase > Configurações do Projeto > Seus Apps > Web.
     const firebaseConfig = {
-      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk", // Use sua chave real
+      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk", // Substitua pela sua chave real
       authDomain: "evoluzion-id1.firebaseapp.com",
       projectId: "evoluzion-id1",
       storageBucket: "evoluzion-id1.appspot.com",
@@ -256,207 +27,193 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let confirmationResult; // Para login com telefone
+    const loginGoogleButton = document.getElementById("loginGoogle");
+    const statusParagraph = document.getElementById("status");
+    const userCountParagraph = document.getElementById("userCount");
 
-    // --- VERIFICAÇÃO INICIAL DE AUTENTICAÇÃO AO CARREGAR A PÁGINA ---
-    // Se o usuário JÁ ESTIVER logado de uma sessão anterior, redireciona IMEDIATAMENTE.
-    if (auth.currentUser) {
-      window.location.href = "./perfil.html";
-    }
+    const provider = new GoogleAuthProvider();
 
-    document.addEventListener("DOMContentLoaded", () => {
-      // DOM Elements
-      const statusText = document.getElementById("status");
-      const userCountText = document.getElementById("userCount");
+    loginGoogleButton.addEventListener("click", async () => {
+      try {
+        statusParagraph.textContent = "Autenticando...";
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
 
-      // Google Login
-      const loginGoogleBtn = document.getElementById("loginGoogle");
-
-      // Email/Password Login
-      const emailInput = document.getElementById("emailInput");
-      const passwordInput = document.getElementById("passwordInput");
-      const loginEmailBtn = document.getElementById("loginEmail");
-      const registerEmailBtn = document.getElementById("registerEmail");
-
-      // Anonymous Login
-      const loginAnonymousBtn = document.getElementById("loginAnonymous");
-
-      // Phone Login
-      const phoneInput = document.getElementById("phoneInput");
-      const recaptchaContainer = document.getElementById("recaptcha-container");
-      const sendSmsCodeBtn = document.getElementById("sendSmsCode");
-      const verifyCodeSection = document.getElementById("verifyCodeSection");
-      const smsCodeInput = document.getElementById("smsCodeInput");
-      const verifySmsCodeBtn = document.getElementById("verifySmsCode");
-
-      // --- Google Login ---
-      loginGoogleBtn.addEventListener("click", async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-          statusText.innerText = "Fazendo login com Google...";
-          const result = await signInWithPopup(auth, provider);
-          const user = result.user;
-          await createUserDocumentIfNew(user);
-          window.location.href = "./perfil.html";
-        } catch (error) {
-          console.error("Erro no login com Google:", error);
-          statusText.innerText = `Erro ao logar com Google: ${error.message}`;
-        }
-      });
-
-      // --- Email/Password Login ---
-      loginEmailBtn.addEventListener("click", async () => {
-        const email = emailInput.value;
-        const password = passwordInput.value;
-        if (!email || !password) {
-          statusText.innerText = "Por favor, preencha e-mail e senha.";
-          return;
-        }
-        try {
-          statusText.innerText = "Fazendo login com e-mail...";
-          const result = await signInWithEmailAndPassword(auth, email, password);
-          const user = result.user;
-          await createUserDocumentIfNew(user);
-          window.location.href = "./perfil.html";
-        } catch (error) {
-          console.error("Erro no login com E-mail:", error);
-          statusText.innerText = `Erro ao logar com E-mail: ${error.message}`;
-        }
-      });
-
-      // --- Email/Password Registration ---
-      registerEmailBtn.addEventListener("click", async () => {
-        const email = emailInput.value;
-        const password = passwordInput.value;
-        if (!email || !password) {
-          statusText.innerText = "Por favor, preencha e-mail e senha para se registrar.";
-          return;
-        }
-        try {
-          statusText.innerText = "Registrando com e-mail...";
-          const result = await createUserWithEmailAndPassword(auth, email, password);
-          const user = result.user;
-          await createUserDocumentIfNew(user, email);
-          window.location.href = "./perfil.html";
-        } catch (error) {
-          console.error("Erro no registro com E-mail:", error);
-          statusText.innerText = `Erro ao registrar com E-mail: ${error.message}`;
-        }
-      });
-
-      // --- Anonymous Login ---
-      loginAnonymousBtn.addEventListener("click", async () => {
-        try {
-          statusText.innerText = "Entrando como anônimo...";
-          const result = await signInAnonymously(auth);
-          const user = result.user;
-          await createUserDocumentIfNew(user, "Usuário Anônimo");
-          window.location.href = "./perfil.html";
-        } catch (error) {
-          console.error("Erro no login Anônimo:", error);
-          statusText.innerText = `Erro ao logar como anônimo: ${error.message}`;
-        }
-      });
-
-      // --- Phone Login (Recaptcha e SMS) ---
-      // Inicializa o reCAPTCHA Verifier
-      // A variável window.recaptchaVerifier é importante para o Firebase Auth.
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'normal',
-        'callback': (response) => {
-          sendSmsCodeBtn.disabled = false;
-        },
-        'expired-callback': () => {
-          sendSmsCodeBtn.disabled = true;
-          statusText.innerText = "ReCAPTCHA expirou, por favor, tente novamente.";
-        }
-      });
-      // Renderiza o reCAPTCHA na página
-      recaptchaVerifier.render().then((widgetId) => {
-        window.recaptchaWidgetId = widgetId;
-      });
-      
-      sendSmsCodeBtn.addEventListener("click", async () => {
-        const phoneNumber = phoneInput.value;
-        if (!phoneNumber) {
-          statusText.innerText = "Por favor, insira um número de telefone.";
-          return;
-        }
-        statusText.innerText = "Enviando código SMS...";
-        sendSmsCodeBtn.disabled = true;
-
-        try {
-          confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
-          verifyCodeSection.style.display = 'block';
-          statusText.innerText = "Código SMS enviado. Verifique seu telefone.";
-        } catch (error) {
-          console.error("Erro ao enviar código SMS:", error);
-          statusText.innerText = `Erro ao enviar código: ${error.message}`;
-          sendSmsCodeBtn.disabled = false;
-          if (window.recaptchaVerifier && window.recaptchaWidgetId) {
-            window.recaptchaVerifier.reset(window.recaptchaWidgetId);
-          }
-        }
-      });
-
-      verifySmsCodeBtn.addEventListener("click", async () => {
-        const code = smsCodeInput.value;
-        if (!code) {
-          statusText.innerText = "Por favor, insira o código SMS.";
-          return;
-        }
-        statusText.innerText = "Verificando código...";
-        verifySmsCodeBtn.disabled = true;
-
-        try {
-          const result = await confirmationResult.confirm(code);
-          const user = result.user;
-          await createUserDocumentIfNew(user, user.phoneNumber);
-          window.location.href = "./perfil.html";
-        } catch (error) {
-          console.error("Erro ao verificar código SMS:", error);
-          statusText.innerText = `Erro ao verificar código: ${error.message}`;
-          verifySmsCodeBtn.disabled = false;
-        }
-      });
-
-      // --- Helper para criar documento do usuário no Firestore se for novo ---
-      async function createUserDocumentIfNew(user, defaultName = null) {
+        // Verifica se o documento do usuário já existe no Firestore
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
+
         if (!userSnap.exists()) {
-          let nameToSet = user.displayName || defaultName || user.email || user.phoneNumber || `Usuário ${user.uid.substring(0, 8)}`;
-          
+          // Se não existir, cria o documento com dados iniciais
           await setDoc(userRef, {
-            uid: user.uid,
-            name: nameToSet,
-            email: user.email || null,
-            phoneNumber: user.phoneNumber || null,
+            email: user.email,
+            name: user.displayName || "",
             createdAt: new Date(),
-            lastLoginAt: new Date()
-          }, { merge: true });
+            // Adicionado campo para controle do tempo de tela para o PWA/App
+            accumulatedDigitalScreenTimeMs: 0 
+          }, { merge: true }); // Usar merge para garantir que outros campos não sejam sobrescritos
+          statusParagraph.textContent = "Novo usuário registrado e logado!";
         } else {
-          await updateDoc(userRef, {
-            lastLoginAt: new Date()
-          });
+          statusParagraph.textContent = "Usuário existente logado!";
         }
-      }
 
-      // --- Contador de Usuários ---
-      async function updateUserCount() {
-        try {
-          const coll = collection(db, "users");
-          const snapshot = await getCountFromServer(coll);
-          userCountText.innerText = `Total de usuários ID1: ${snapshot.data().count}`;
-        } catch (error) {
-          console.error("Erro ao obter a contagem de usuários:", error);
-          userCountText.innerText = `Total de usuários ID1: Erro ao carregar.`;
-        }
+        console.log("Usuário logado:", user.displayName);
+        window.location.href = "./perfil.html"; // Redireciona para a página de perfil
+      } catch (error) {
+        console.error("Erro no login:", error);
+        statusParagraph.textContent = `Erro no login: ${error.message}`;
       }
-
-      // Atualiza o contador de usuários quando o DOM estiver pronto
-      updateUserCount();
     });
+
+    // Função para atualizar a contagem de usuários
+    async function updateUserCount() {
+      try {
+        console.log("Tentando obter contagem de usuários...");
+        const usersCollectionRef = collection(db, "users");
+        const snapshot = await getCountFromServer(usersCollectionRef);
+        userCountParagraph.textContent = `Total de identidades digitais emitidas: ${snapshot.data().count}`;
+        console.log("Contagem de usuários obtida com sucesso:", snapshot.data().count);
+      } catch (error) {
+        console.error("Erro ao obter contagem de usuários:", error);
+        userCountParagraph.textContent = "Erro ao carregar contagem.";
+      }
+    }
+
+    // Monitora o estado de autenticação para atualizar a contagem ou redirecionar
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Se já estiver logado, redireciona para o perfil imediatamente
+        window.location.href = "./perfil.html";
+      } else {
+        // Se não estiver logado, apenas atualiza a contagem
+        updateUserCount();
+      }
+    });
+
+    // Garante que a contagem seja atualizada ao carregar a página se o usuário não estiver logado
+    document.addEventListener("DOMContentLoaded", () => {
+      // A verificação onAuthStateChanged já cuida do carregamento inicial e redirecionamento.
+      // Esta parte garante que a contagem seja atualizada se o usuário NÃO estiver logado.
+      if (!auth.currentUser) { // Verifica o estado atual do usuário
+          updateUserCount();
+      }
+    });
+  </script>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      text-align: center; 
+      background: #f5f5f5; 
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header { 
+      background: #0c0c0c; 
+      color: white; 
+      padding: 1rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    header h1 { 
+      margin: 0; 
+      font-size: 1.5rem; 
+    }
+    header button { 
+      background: white; 
+      color: black; 
+      border: none; 
+      padding: 0.5rem 1rem; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    header button:hover {
+      background-color: #eee;
+    }
+    main { 
+      flex-grow: 1;
+      padding: 2rem; 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .mapa { 
+      width: 100%; 
+      max-width: 600px; 
+      margin: auto; 
+      background: #ddd; 
+      padding: 2rem; 
+      border-radius: 1rem; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    footer { 
+      background: #0c0c0c; 
+      color: white; 
+      padding: 1rem; 
+      margin-top: auto; 
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    }
+    h2 {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    p {
+        color: #555;
+        line-height: 1.6;
+    }
+    #status {
+        font-weight: bold;
+        color: #e74c3c;
+        margin-top: 1rem;
+    }
+    #userCount {
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ID1: Identidade Digital Evoluzion</h1>
+    <button id="loginGoogle">Login com Google</button>
+  </header>
+
+  <main>
+    <h2>🌍 Bem-vindo à identidade digital universal</h2>
+    <p>Uma só identidade. Um só planeta. Um só povo.</p>
+    <p id="status"></p>
+    <p id="userCount">Total de identidades digitais emitidas: Carregando...</p>
+
+    <div class="mapa">
+        <p>Imagine o mapa mundial da vida de cada pessoa. 🗺️</p>
+        <p>Seus dados são um ponto valioso nessa jornada global.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Evoluzion. Todos os direitos reservados.</p>
+  </footer>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then((registration) => {
+            console.log('Service Worker registrado com sucesso:', registration.scope);
+          })
+          .catch((error) => {
+            console.error('Falha no registro do Service Worker:', error);
+          });
+      });
+    }
   </script>
 </body>
 </html>
