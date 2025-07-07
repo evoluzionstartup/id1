@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Meu Perfil ID1</title>
   
+  <!-- PWA: Link para o arquivo manifest.json -->
   <link rel="manifest" href="/manifest.json">
+
+  <!-- D3.js e TopoJSON para o Mapa Interativo -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
 
   <style>
     body {
@@ -128,7 +133,7 @@
     }
 
     /* Estilos dos Cards (dentro das abas) */
-    .profile-card, .info-card {
+    .profile-card, .info-card, .section-card { /* Adicionado .section-card */
       background: #ffffff;
       padding: 0;
       border-radius: 8px;
@@ -138,7 +143,7 @@
       margin: 0 auto;
       text-align: left;
     }
-    .profile-card h2, .info-card h2 {
+    .profile-card h2, .info-card h2, .section-card h2, .section-card h3 { /* Adicionado .section-card */
       color: #34495e;
       margin-bottom: 25px;
       text-align: center;
@@ -289,6 +294,79 @@
         font-weight: bold;
         color: #007bff; /* Azul para destacar valores */
     }
+
+    /* Estilos para o Mapa */
+    #world-map-container {
+      width: 100%;
+      max-width: 700px;
+      height: 400px; /* Altura fixa para o mapa */
+      margin: 20px auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden; /* Garante que o mapa não vaze */
+      background-color: #e0f2f7; /* Cor de fundo do oceano */
+      position: relative;
+    }
+    #world-map-container svg {
+      width: 100%;
+      height: 100%;
+    }
+    .country {
+      fill: #a8dadc; /* Cor padrão dos países */
+      stroke: #ffffff; /* Borda dos países */
+      stroke-width: 0.5px;
+      cursor: pointer;
+      transition: fill 0.2s ease;
+    }
+    .country:hover {
+      fill: #457b9d; /* Cor ao passar o mouse */
+    }
+    .country-label {
+      font-size: 10px;
+      fill: #333;
+      pointer-events: none; /* Não interfere com cliques no país */
+    }
+    #country-info-box {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      display: none; /* Escondido por padrão */
+      white-space: nowrap; /* Não quebra linha */
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    /* Ranking de países */
+    .country-ranking {
+        margin-top: 30px;
+        text-align: center;
+    }
+    .country-ranking ol {
+        list-style: decimal;
+        padding: 0;
+        margin: 0 auto;
+        max-width: 400px; /* Limita a largura da lista */
+        text-align: left;
+    }
+    .country-ranking li {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .country-ranking li:last-child {
+        border-bottom: none;
+    }
+    .country-ranking li span {
+        font-weight: bold;
+        color: #34495e;
+    }
+
   </style>
 </head>
 <body>
@@ -303,6 +381,7 @@
   <main>
     <div class="tabs-container">
       <div class="tab-buttons">
+        <button class="tab-button" data-tab="global-overview">Visão Geral Global</button>
         <button class="tab-button" data-tab="profile">Meu Perfil</button>
         <button class="tab-button" data-tab="documents">Carteira de Documentos</button>
         <button class="tab-button" data-tab="tvv">TVV</button>
@@ -310,6 +389,64 @@
         <button class="tab-button" data-tab="tvdt">TVDT</button>
       </div>
 
+      <!-- Aba: Visão Geral Global (NOVA ABA) -->
+      <div id="global-overview-content" class="tab-content hidden">
+        <h2>Visão Geral Global
+          <div class="info-icon-container">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-popup">
+              Explore dados globais sobre a população mundial e o impacto da Identidade Digital Evoluzion.
+            </div>
+          </div>
+        </h2>
+        
+        <div class="section-card">
+          <h3>Total de Identidades Digitais Emitidas</h3>
+          <p class="small-text">Usuários registrados na plataforma ID1.</p>
+          <p class="highlight-number" id="globalUserCountDisplay">Carregando...</p>
+        </div>
+
+        <div class="section-card">
+          <h3>População Mundial</h3>
+          <p>A população humana é o nosso maior recurso. Estimamos a população atual do planeta em:</p>
+          <span id="worldPopulationDisplayGlobal" class="highlight-number">Carregando...</span>
+          <p class="small-text">Este é um contador simulado, atualizado a cada milissegundo.</p>
+          
+          <h4>Fontes de Consulta:</h4>
+          <ul>
+            <li><a href="https://www.un.org/development/desa/pd/content/world-population-prospects" target="_blank" rel="noopener noreferrer">Nações Unidas (ONU) - World Population Prospects</a></li>
+            <li><a href="https://data.worldbank.org/indicator/SP.POP.TOTL" target="_blank" rel="noopener noreferrer">Banco Mundial - População Total</a></li>
+            <li><a href="https://www.worldometers.info/world-population/" target="_blank" rel="noopener noreferrer">Worldometer - Contador de População Mundial</a></li>
+          </ul>
+        </div>
+
+        <div class="section-card">
+          <h3>O Maior Ativo da Humanidade</h3>
+          <p>Considerando que cada humano tenha o mínimo de tempo de vida atribuído de 122 anos, 5 meses e 14 dias (44724 dias), o potencial de vida total da humanidade é:</p>
+          <span id="humanityAssetNumberGlobal" class="highlight-number">Calculando...</span>
+          <p id="humanityAssetExtensoGlobal" class="number-extenso"></p>
+          <p style="text-align: center; font-size: 1.2rem; font-weight: bold; color: #28a745; margin-top: 20px;">
+            Esse é o maior ativo da humanidade.
+          </p>
+        </div>
+
+        <div class="section-card">
+          <h3>Mapa Mundial Interativo</h3>
+          <p class="small-text">Clique em um país para ver sua população (dados periodicamente atualizados).</p>
+          <div id="world-map-container">
+            <div id="country-info-box"></div>
+          </div>
+          <div class="country-ranking">
+            <h3>Ranking dos Países Mais Populosos (Estimativa)</h3>
+            <p class="small-text">Dados baseados em estimativas recentes.</p>
+            <ol id="countryRankingList">
+              <!-- O ranking será preenchido via JavaScript -->
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aba: Meu Perfil -->
       <div id="profile-content" class="tab-content hidden">
         <h2>Meus Dados
           <div class="info-icon-container">
@@ -345,6 +482,7 @@
         <button id="saveProfileButton" class="button-save">Salvar Perfil</button>
       </div>
 
+      <!-- Aba: Carteira de Documentos -->
       <div id="documents-content" class="tab-content hidden">
         <h2>Carteira de Documentos
           <div class="info-icon-container">
@@ -358,6 +496,7 @@
         <p>Em breve, você poderá armazenar e acessar seus documentos de forma segura aqui.</p>
       </div>
 
+      <!-- Aba: TVV (Tempo de Vida Vivido) -->
       <div id="tvv-content" class="tab-content hidden">
         <h2>TVV (Tempo de Vida Vivido)
           <div class="info-icon-container">
@@ -392,6 +531,7 @@
         </div>
       </div>
 
+      <!-- Aba: TVT (Tempo de Vida Token) -->
       <div id="tvt-content" class="tab-content hidden">
         <h2>TVT (Tempo de Vida Token)
           <div class="info-icon-container">
@@ -410,8 +550,15 @@
           </div>
           <p class="small-text">Este é o valor de referência do TVT.</p>
         </div>
+        
+        <div class="time-section">
+          <h3>Total de Identidades Digitais</h3>
+          <p class="small-text">Número de usuários registrados na plataforma.</p>
+          <p class="bold-value" id="totalRegisteredUsersCount">Carregando...</p>
+        </div>
       </div>
 
+      <!-- Aba: TVDT (Tempo de Vida Destinado às Telas) -->
       <div id="tvdt-content" class="tab-content hidden">
         <h2>TVDT (Tempo de Vida Destinado às Telas)
           <div class="info-icon-container">
@@ -456,7 +603,9 @@
       getFirestore, 
       doc, 
       getDoc, 
-      updateDoc 
+      updateDoc,
+      collection, 
+      getCountFromServer 
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -472,7 +621,17 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // DOM Elements - Perfil
+    // --- Constantes para o cálculo global ---
+    // Estimativa inicial da população mundial (aproximadamente 8.1 bilhões)
+    let WORLD_POPULATION_LIVE_ESTIMATE = 8100000000; 
+    // Taxa de incremento para simular o contador vivo (ajuste conforme desejar)
+    // A população mundial aumenta em ~2.5 pessoas por segundo.
+    // 2.5 pessoas/segundo = 0.0025 pessoas/milissegundo
+    const WORLD_POPULATION_INCREMENT_PER_MS = 0.0025; 
+
+    const JEANNE_CALMENT_LIFESPAN_DAYS = 44724; // 122 anos, 5 meses e 14 dias em dias
+
+    // --- DOM Elements - Perfil ---
     const statusText = document.getElementById("status");
     const nameInput = document.getElementById("nameInput");
     const emailInput = document.getElementById("emailInput");
@@ -482,11 +641,20 @@
     const logoutButton = document.getElementById("logoutButton");
     const headerProfileIcon = document.getElementById("headerProfileIcon");
 
-    // DOM Elements - Abas
+    // --- DOM Elements - Abas ---
     const tabButtons = document.querySelectorAll(".tab-button");
     const tabContents = document.querySelectorAll(".tab-content");
 
-    // DOM Elements - Homenagem Jeanne Calment (no TVV)
+    // --- DOM Elements - Visão Geral Global ---
+    const globalUserCountDisplay = document.getElementById("globalUserCountDisplay");
+    const worldPopulationDisplayGlobal = document.getElementById("worldPopulationDisplayGlobal");
+    const humanityAssetNumberGlobal = document.getElementById("humanityAssetNumberGlobal");
+    const humanityAssetExtensoGlobal = document.getElementById("humanityAssetExtensoGlobal");
+    const countryInfoBox = document.getElementById("country-info-box");
+    const countryRankingList = document.getElementById("countryRankingList");
+
+
+    // --- DOM Elements - Homenagem Jeanne Calment (no TVV) ---
     const calmentYearsSpan = document.getElementById("calmentYears");
     const calmentMonthsSpan = document.getElementById("calmentMonths");
     const calmentDaysSpan = document.getElementById("calmentDays");
@@ -494,7 +662,7 @@
     const calmentTotalMonthsSpan = document.getElementById("calmentTotalMonths");
     const calmentTotalDaysSpan = document.getElementById("calmentTotalDays");
 
-    // DOM Elements - Seu Tempo de Vida (no TVV)
+    // --- DOM Elements - Seu Tempo de Vida (no TVV) ---
     const myLifeCounterSection = document.getElementById("myLifeCounterSection");
     const myLifeYearsSpan = document.getElementById("myLifeYears");
     const myLifeMonthsSpan = document.getElementById("myLifeMonths");
@@ -508,7 +676,7 @@
     const myLifeTotalDaysSpan = document.getElementById("myLifeTotalDays");
 
 
-    // DOM Elements - TVT
+    // --- DOM Elements - TVT ---
     const tvtDisplay = document.getElementById("tvtDisplay");
     const tvtYearsSpan = document.getElementById("tvtYears");
     const tvtMonthsSpan = document.getElementById("tvtMonths");
@@ -517,9 +685,10 @@
     const tvtMinutesSpan = document.getElementById("tvtMinutes");
     const tvtSecondsSpan = document.getElementById("tvtSeconds");
     const tvtMillisecondsSpan = document.getElementById("tvtMilliseconds");
+    const totalRegisteredUsersCount = document.getElementById("totalRegisteredUsersCount");
 
 
-    // DOM Elements - TVDT
+    // --- DOM Elements - TVDT ---
     const totalLoggedTimeDisplay = document.getElementById("totalLoggedTimeDisplay");
     const loggedHoursSpan = document.getElementById("loggedHours");
     const loggedMinutesSpan = document.getElementById("loggedMinutes");
@@ -533,20 +702,18 @@
     const tvdtMillisecondsSpan = document.getElementById("tvdtMilliseconds");
 
 
-    let userBirthDate = null; // Armazena a data de nascimento do usuário para o contador de vida
-    let pageLoadTime = 0; // Hora que a página foi carregada para cálculo de sessão atual
-    let accumulatedDigitalScreenTimeMs = 0; // Tempo total acumulado de uso do site
-    let userHasLoggedInOnce = false; // Flag para a primeira vez que o usuário loga e preenche dados
-
+    let userBirthDate = null;
+    let pageLoadTime = 0;
+    let accumulatedDigitalScreenTimeMs = 0;
+    let userHasLoggedInOnce = false;
+    let worldPopulationInterval; // Intervalo para o contador de população mundial
 
     // --- Funções de Utilitário de Data e Tempo ---
 
-    // Adiciona padding zero à esquerda
     function pad(num, length = 2) {
       return num.toString().padStart(length, '0');
     }
 
-    // Calcula diferença entre duas datas em anos, meses e dias exatos
     function getExactAge(birthDate, endDate) {
       const start = new Date(birthDate.getTime());
       const end = new Date(endDate.getTime());
@@ -566,23 +733,19 @@
       return { years, months, days };
     }
 
-    // Calcula total de dias, meses e anos
     function getTotalDuration(startDate, endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
 
-        const diffTime = Math.abs(end - start); // Diferença em milissegundos
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Usar floor para total de dias completos
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         
-        // Para total de meses e anos, podemos usar a mesma lógica de getExactAge mas sem negativar
-        // Ou uma estimativa baseada em dias médios, mas para "total de" a forma abaixo é mais comum:
         const totalYears = end.getFullYear() - start.getFullYear() - (end < new Date(end.getFullYear(), start.getMonth(), start.getDate()) ? 1 : 0);
         const totalMonths = totalYears * 12 + (end.getMonth() - start.getMonth()) - (end.getDate() < start.getDate() ? 1 : 0);
         
         return { totalYears, totalMonths, totalDays: diffDays };
     }
 
-    // Converte milissegundos para formato H:M:S.MS
     function formatMillisecondsToHMS(ms) {
       const totalSeconds = Math.floor(ms / 1000);
       const totalMinutes = Math.floor(totalSeconds / 60);
@@ -601,13 +764,7 @@
       };
     }
 
-    // Converte milissegundos para formato A:M:D H:M:S.MS
     function formatMillisecondsToFullAge(ms) {
-      // Implementação para obter anos, meses, dias a partir de milissegundos
-      // É mais preciso usar o cálculo de diferença de datas para anos/meses/dias
-      // e então o restante em horas/minutos/segundos/ms.
-      // Esta função será para o TVT/TVDT que são apenas durações em MS.
-
       const days = Math.floor(ms / (1000 * 60 * 60 * 24));
       let remainingMs = ms % (1000 * 60 * 60 * 24);
 
@@ -623,11 +780,81 @@
       return { days, hours, minutes, seconds, milliseconds };
     }
 
+    // --- Função para converter número para extenso em Português (mais robusta) ---
+    function numberToExtenso(num) {
+        if (num === 0) return "zero";
+        if (num < 0) return "menos " + numberToExtenso(Math.abs(num));
+
+        const unidades = ["", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove"];
+        const especiais = ["dez", "onze", "doze", "treze", "quatorze", "quinze", "dezesseis", "dezessete", "dezoito", "dezenove"];
+        const dezenas = ["", especiais[0], "vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa"];
+        const centenas = ["", "cento", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seiscentos", "setecentos", "oitocentos", "novecentos"];
+        const grandezas = [
+            ["", ""], ["mil", "mil"], ["milhão", "milhões"], ["bilhão", "bilhões"], ["trilhão", "trilhões"]
+        ];
+
+        function converterChunk(n) {
+            let s = "";
+            let c = Math.floor(n / 100);
+            let d = Math.floor((n % 100) / 10);
+            let u = n % 10;
+
+            if (n === 100) return "cem";
+            if (c > 0) s += centenas[c];
+
+            if (d === 1 && u > 0) {
+                if (s !== "") s += " e ";
+                s += especiais[u];
+            } else {
+                if (d > 0) {
+                    if (s !== "") s += " e ";
+                    s += dezenas[d];
+                }
+                if (u > 0) {
+                    if (s !== "" && (d !== 0 || c !== 0)) s += " e ";
+                    else if (s !== "" && d === 0 && c === 0 && n !== 0) s += " e "; // "e" para 101, 1001, etc.
+                    s += unidades[u];
+                }
+            }
+            return s;
+        }
+
+        let strNum = String(num);
+        let chunks = [];
+        while (strNum.length > 0) {
+            chunks.unshift(parseInt(strNum.slice(-3), 10));
+            strNum = strNum.slice(0, -3);
+        }
+
+        let resultado = [];
+        for (let i = 0; i < chunks.length; i++) {
+            let chunk = chunks[i];
+            if (chunk === 0 && chunks.length > 1 && i !== chunks.length -1) continue;
+
+            let textoChunk = converterChunk(chunk);
+            let grandeza = grandezas[chunks.length - 1 - i];
+
+            if (textoChunk !== "") {
+                if (grandeza[0] !== "") {
+                    if (chunk === 1 && grandeza[0] !== "mil") {
+                        resultado.push(textoChunk + " " + grandeza[0]);
+                    } else if (chunk > 1 && grandeza[1] !== "") {
+                        resultado.push(textoChunk + " " + grandeza[1]);
+                    } else {
+                        resultado.push(textoChunk + (grandeza[0] ? " " + grandeza[0] : ""));
+                    }
+                } else {
+                    resultado.push(textoChunk);
+                }
+            }
+        }
+        return resultado.join(" e ");
+    }
+
 
     // --- Homenagem a Jeanne Calment (no TVV) ---
-    // Datas de Jeanne Calment (GMT/UTC para consistência)
-    const calmentBirthDate = new Date(Date.UTC(1875, 1, 21, 0, 0, 0)); // Mês é 0-indexado, então 1 é fevereiro
-    const calmentDeathDate = new Date(Date.UTC(1997, 7, 4, 0, 0, 0)); // Mês é 0-indexado, então 7 é agosto
+    const calmentBirthDate = new Date(Date.UTC(1875, 1, 21, 0, 0, 0));
+    const calmentDeathDate = new Date(Date.UTC(1997, 7, 4, 0, 0, 0));
 
     function displayCalmentTribute() {
       const age = getExactAge(calmentBirthDate, calmentDeathDate);
@@ -665,7 +892,6 @@
       myLifeMonthsSpan.textContent = pad(ageExact.months);
       myLifeDaysSpan.textContent = pad(ageExact.days);
 
-      // Calcula horas, minutos, segundos, milissegundos restantes do dia atual
       let remainingMilliseconds = diffMilliseconds % (1000 * 60 * 60 * 24);
 
       const hours = Math.floor(remainingMilliseconds / (1000 * 60 * 60));
@@ -697,8 +923,7 @@
 
       const duration = formatMillisecondsToFullAge(tvtMs);
 
-      // Para exibir anos/meses/dias para TVT com "1 dia a mais" de forma precisa
-      const theoreticalDeathDate = new Date(calmentDeathDate.getTime() + oneDayMs);
+      const theoreticalDeathDate = new Date(calmentBirthDate.getTime() + tvtMs); // Calcula a data teórica com base nos milissegundos
       const tvtAgeExact = getExactAge(calmentBirthDate, theoreticalDeathDate);
 
       tvtYearsSpan.textContent = pad(tvtAgeExact.years);
@@ -712,25 +937,24 @@
 
     // --- TVDT (Tempo de Vida Destinado às Telas) ---
     let tvdtInterval;
-    let currentSessionStartTime = 0; // Marca o início da sessão atual na aba
-    let currentLoggedTimeMs = 0; // Tempo logado na sessão atual
+    let currentSessionStartTime = 0;
+    let currentLoggedTimeMs = 0;
     
-    // Funções para lidar com o tempo de tela
     function startScreenTimeTracking() {
-        if (currentSessionStartTime === 0) { // Inicia apenas se não estiver já rodando
+        if (currentSessionStartTime === 0) {
             currentSessionStartTime = Date.now();
         }
         if (!tvdtInterval) {
             tvdtInterval = setInterval(() => {
-                if (!document.hidden) { // Apenas conta se a aba está visível
+                if (!document.hidden) {
                     const now = Date.now();
                     const elapsed = now - currentSessionStartTime;
                     currentLoggedTimeMs += elapsed;
-                    currentSessionStartTime = now; // Reinicia para a próxima contagem
+                    currentSessionStartTime = now;
 
                     displayTVDTData();
                 }
-            }, 100); // Atualiza a cada 100ms para menor carga, milissegundos ainda visíveis
+            }, 100);
         }
     }
 
@@ -739,14 +963,11 @@
             clearInterval(tvdtInterval);
             tvdtInterval = null;
         }
-        // Ao parar, adiciona o tempo da sessão atual ao total acumulado
-        // Apenas se a sessão teve algum tempo
         if (currentLoggedTimeMs > 0) {
             accumulatedDigitalScreenTimeMs += currentLoggedTimeMs;
         }
-        currentLoggedTimeMs = 0; // Reseta para a sessão atual
+        currentLoggedTimeMs = 0;
         
-        // Salva no Firestore
         const user = auth.currentUser;
         if (user) {
             updateDoc(doc(db, "users", user.uid), {
@@ -757,9 +978,7 @@
         }
     }
 
-    // Exibe os dados do TVDT
     function displayTVDTData() {
-        // Tempo Total Logado (acumulado de sessões anteriores + sessão atual)
         const totalCurrentLoggedMs = accumulatedDigitalScreenTimeMs + currentLoggedTimeMs;
         const loggedFormatted = formatMillisecondsToHMS(totalCurrentLoggedMs);
         loggedHoursSpan.textContent = pad(loggedFormatted.hours);
@@ -767,13 +986,130 @@
         loggedSecondsSpan.textContent = pad(loggedFormatted.seconds);
         loggedMillisecondsSpan.textContent = pad(loggedFormatted.milliseconds, 3);
 
-        // TVDT Calculado (Tempo Total Logado x 2)
         const tvdtCalculatedMs = totalCurrentLoggedMs * 2;
         const tvdtFormatted = formatMillisecondsToHMS(tvdtCalculatedMs);
         tvdtHoursSpan.textContent = pad(tvdtFormatted.hours);
         tvdtMinutesSpan.textContent = pad(tvdtFormatted.minutes);
         tvdtSecondsSpan.textContent = pad(tvdtFormatted.seconds);
         tvdtMillisecondsSpan.textContent = pad(tvdtFormatted.milliseconds, 3);
+    }
+
+    // --- Função para obter a contagem total de usuários registrados (para Visão Geral Global e TVT) ---
+    async function updateTotalRegisteredUsersCount() {
+        try {
+            const usersCollectionRef = collection(db, "users");
+            const snapshot = await getCountFromServer(usersCollectionRef);
+            globalUserCountDisplay.textContent = snapshot.data().count; // Para Visão Geral Global
+            totalRegisteredUsersCount.textContent = snapshot.data().count; // Para aba TVT
+        } catch (error) {
+            console.error("Erro ao obter contagem total de usuários:", error);
+            globalUserCountDisplay.textContent = "Erro ao carregar.";
+            totalRegisteredUsersCount.textContent = "Erro ao carregar.";
+        }
+    }
+
+    // --- Funções para População Mundial e Ativo da Humanidade (na aba Visão Geral Global) ---
+    let worldPopulationLiveInterval;
+
+    function updateWorldPopulationLive() {
+        WORLD_POPULATION_LIVE_ESTIMATE += WORLD_POPULATION_INCREMENT_PER_MS * 10; // Incrementa a cada 10ms
+        worldPopulationDisplayGlobal.textContent = Math.floor(WORLD_POPULATION_LIVE_ESTIMATE).toLocaleString('pt-BR');
+        displayHumanityAssetGlobal(); // Recalcula o ativo da humanidade com a nova população
+    }
+
+    function displayHumanityAssetGlobal() {
+        const totalAssetDays = Math.floor(WORLD_POPULATION_LIVE_ESTIMATE) * JEANNE_CALMENT_LIFESPAN_DAYS;
+        humanityAssetNumberGlobal.textContent = totalAssetDays.toLocaleString('pt-BR') + " dias";
+        humanityAssetExtensoGlobal.textContent = numberToExtenso(totalAssetDays) + " dias";
+    }
+
+    // --- Mapa Interativo (D3.js) ---
+    const mapContainer = d3.select("#world-map-container");
+    const width = 700;
+    const height = 400;
+
+    const svg = mapContainer.append("svg")
+        .attr("viewBox", `0 0 ${width} ${height}`);
+
+    const projection = d3.geoMercator()
+        .scale(120) // Ajuste a escala para o mapa caber
+        .center([0, 20]) // Centraliza o mapa (longitude, latitude)
+        .translate([width / 2, height / 2]);
+
+    const path = d3.geoPath().projection(projection);
+
+    // Dados de população de exemplo para alguns países (baseados em Worldometer 2024/2025)
+    // Usando códigos ISO 3166-1 alpha-3 para mapeamento com o TopoJSON
+    const countryPopulationsData = {
+        "CHN": { name: "China", population: 1425000000 },
+        "IND": { name: "Índia", population: 1428000000 },
+        "USA": { name: "Estados Unidos", population: 341000000 },
+        "IDN": { name: "Indonésia", population: 279000000 },
+        "PAK": { name: "Paquistão", population: 243000000 },
+        "NGA": { name: "Nigéria", population: 228000000 },
+        "BRA": { name: "Brasil", population: 216000000 },
+        "BGD": { name: "Bangladesh", population: 174000000 },
+        "RUS": { name: "Rússia", population: 144000000 },
+        "MEX": { name: "México", population: 129000000 },
+        "JPN": { name: "Japão", population: 123000000 },
+        "ETH": { name: "Etiópia", population: 127000000 },
+        "PHL": { name: "Filipinas", population: 119000000 },
+        "EGY": { name: "Egito", population: 114000000 },
+        "VNM": { name: "Vietnã", population: 99000000 },
+        "COD": { name: "RD Congo", population: 105000000 },
+        "IRN": { name: "Irã", population: 89000000 },
+        "TUR": { name: "Turquia", population: 86000000 },
+        "DEU": { name: "Alemanha", population: 83000000 },
+        "THA": { name: "Tailândia", population: 71000000 }
+    };
+
+    d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(world => {
+        const countries = topojson.feature(world, world.objects.countries);
+
+        svg.selectAll("path")
+            .data(countries.features)
+            .enter().append("path")
+            .attr("class", "country")
+            .attr("d", path)
+            .on("click", function(event, d) {
+                const countryName = d.properties.name;
+                const countryCode = d.id; 
+                const countryData = countryPopulationsData[countryCode];
+                const population = countryData ? countryData.population.toLocaleString('pt-BR') : "Dados não disponíveis";
+                
+                countryInfoBox.style.display = "block";
+                countryInfoBox.textContent = `${countryName}: Pop. ~${population}`;
+            });
+        
+        svg.on("click", function(event) {
+            if (event.target.tagName === "svg" || event.target.classList.contains("country")) {
+                // Não esconde se clicou no SVG ou em um país (já tratado pelo click do país)
+            } else {
+                countryInfoBox.style.display = "none";
+            }
+        });
+    }).catch(error => {
+        console.error("Erro ao carregar dados do mapa:", error);
+        mapContainer.append("p").text("Erro ao carregar o mapa. Tente novamente mais tarde.");
+    });
+
+    // --- Ranking dos Países Mais Populosos ---
+    function displayCountryRanking() {
+        // Converte o objeto de dados em um array, filtra por países com população, e ordena
+        const sortedCountries = Object.keys(countryPopulationsData)
+            .map(code => ({ code, ...countryPopulationsData[code] }))
+            .filter(country => country.population) // Garante que tem população
+            .sort((a, b) => b.population - a.population) // Ordena do maior para o menor
+            .slice(0, 10); // Pega os top 10
+
+        const listElement = document.getElementById("countryRankingList");
+        listElement.innerHTML = ''; // Limpa a lista existente
+
+        sortedCountries.forEach(country => {
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `<span>${country.name}</span>: ${country.population.toLocaleString('pt-BR')}`;
+            listElement.appendChild(listItem);
+        });
     }
 
 
@@ -783,9 +1119,9 @@
         emailInput.value = user.email || "Não disponível";
         await loadUserProfile(user.uid);
         
-        // Define a aba 'TVV' como ativa por padrão se o usuário já preencheu dados
+        // Define a aba 'Visão Geral Global' como ativa por padrão se o usuário já preencheu dados
         if (userHasLoggedInOnce) {
-          document.querySelector('.tab-button[data-tab="tvv"]').click();
+          document.querySelector('.tab-button[data-tab="global-overview"]').click();
         } else {
           // Se for a primeira vez, mantém no perfil para preencher
           document.querySelector('.tab-button[data-tab="profile"]').click();
@@ -818,7 +1154,6 @@
           
           accumulatedDigitalScreenTimeMs = currentUserData.accumulatedDigitalScreenTimeMs || 0;
 
-          // Se o nome e a data de nascimento já foram preenchidos, consideramos que o usuário já "preencheu os dados"
           if (currentUserData.name && currentUserData.dateOfBirth) {
             userHasLoggedInOnce = true;
           } else {
@@ -859,7 +1194,6 @@
       let updatedDateOfBirth = null;
       if (dobString) {
         try {
-          // Garante que a data seja salva como UTC meia-noite para consistência
           updatedDateOfBirth = new Date(dobString + "T00:00:00Z"); 
           if (isNaN(updatedDateOfBirth.getTime())) {
             throw new Error("Data de nascimento inválida.");
@@ -876,11 +1210,10 @@
           name: updatedName,
           dateOfBirth: updatedDateOfBirth,
           placeOfBirth: updatedPlaceOfBirth
-        }, { merge: true }); // Usar merge para não sobrescrever outros campos
+        }, { merge: true });
 
-        userBirthDate = updatedDateOfBirth; // Atualiza a variável local
+        userBirthDate = updatedDateOfBirth;
         
-        // Verifica se os dados essenciais foram preenchidos para setar userHasLoggedInOnce
         if (updatedName && updatedDateOfBirth) {
             userHasLoggedInOnce = true;
         }
@@ -895,7 +1228,7 @@
 
     // --- Sair (Logout) ---
     logoutButton.addEventListener("click", async () => {
-      stopScreenTimeTracking(); // Salva o tempo de tela antes de sair
+      stopScreenTimeTracking();
       try {
         await signOut(auth);
         window.location.href = "./index.html";
@@ -919,19 +1252,28 @@
         // Gerencia os intervalos dos relógios
         if (myLifeInterval) clearInterval(myLifeInterval);
         if (tvtInterval) clearInterval(tvtInterval);
+        if (worldPopulationLiveInterval) clearInterval(worldPopulationLiveInterval); // Limpa o intervalo da população mundial
         stopScreenTimeTracking(); // Para e salva o tempo de tela ao trocar de aba
 
         if (targetTab === 'tvv') {
-          updateMyLifeClock(); // Chama uma vez para inicializar
+          updateMyLifeClock();
           myLifeInterval = setInterval(updateMyLifeClock, 10);
         } else if (targetTab === 'tvt') {
-          calculateAndDisplayTVT(); // Calcula e exibe TVT
-          // TVT não é um relógio vivo em milissegundos no sentido de tempo decorrido, mas uma duração fixa
-          // Se quiser que ele "pisque" milissegundos, podemos simular:
-          tvtInterval = setInterval(calculateAndDisplayTVT, 10); // Para simular um "relógio" em ms
+          calculateAndDisplayTVT();
+          updateTotalRegisteredUsersCount();
+          tvtInterval = setInterval(calculateAndDisplayTVT, 10);
         } else if (targetTab === 'tvdt') {
-            startScreenTimeTracking(); // Inicia o rastreamento do tempo de tela
-            displayTVDTData(); // Exibe os dados iniciais
+            startScreenTimeTracking();
+            displayTVDTData();
+        } else if (targetTab === 'global-overview') { // Lógica para a aba Visão Geral Global
+            updateTotalRegisteredUsersCount(); // Atualiza a contagem de usuários
+            // Inicia o contador de população mundial simulado
+            if (!worldPopulationLiveInterval) {
+                worldPopulationLiveInterval = setInterval(updateWorldPopulationLive, 10); // Atualiza a cada 10ms
+            }
+            displayHumanityAssetGlobal(); // Atualiza o ativo da humanidade
+            displayCountryRanking(); // Exibe o ranking dos países
+            // O mapa é renderizado uma vez no DOMContentLoaded, não precisa de atualização aqui
         }
       });
     });
@@ -943,7 +1285,7 @@
 
     // --- Inicialização ao Carregar a Página ---
     document.addEventListener("DOMContentLoaded", () => {
-      displayCalmentTribute(); // Exibe a homenagem a Jeanne Calment
+      displayCalmentTribute();
       
       // O onAuthStateChanged vai decidir qual aba abrir inicialmente
       // E ele carrega os dados do perfil, incluindo accumulatedDigitalScreenTimeMs
@@ -951,11 +1293,13 @@
 
     // --- Salvar tempo de tela acumulado ao fechar/navegar na página ---
     window.addEventListener('beforeunload', () => {
-        stopScreenTimeTracking(); // Garante que o tempo da sessão atual seja salvo
+        stopScreenTimeTracking();
+        if (worldPopulationLiveInterval) clearInterval(worldPopulationLiveInterval); // Limpa o intervalo da população mundial
     });
 
   </script>
 
+  <!-- PWA: Registro do Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
