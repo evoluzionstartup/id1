@@ -1,5 +1,5 @@
 // Nome do cache para controle de versão
-const CACHE_NAME = 'id1-evoluzion-cache-v1';
+const CACHE_NAME = 'id1-evoluzion-cache-v2';
 
 // Lista de arquivos para cachear (app shell)
 const urlsToCache = [
