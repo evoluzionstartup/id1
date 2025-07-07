@@ -80,6 +80,25 @@
       content: "👤"; /* Ícone de usuário simples */
     }
 
+    /* Ampulheta Digital no Header */
+    .header-hourglass {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 1rem;
+      color: #f0f0f0; /* Cor clara para contraste */
+      background-color: rgba(0,0,0,0.3);
+      padding: 0.3rem 0.6rem;
+      border-radius: 5px;
+      margin-left: 20px; /* Espaço entre o título e a ampulheta */
+      display: flex;
+      align-items: center;
+      gap: 5px; /* Espaço entre o ícone e o texto */
+    }
+    .header-hourglass::before {
+        content: "⏳"; /* Ícone de ampulheta */
+        font-size: 1.2em;
+    }
+
+
     main {
       flex-grow: 1;
       padding: 2rem;
@@ -347,7 +366,8 @@
   <header>
     <div class="header-left">
       <div class="profile-icon-header" id="headerProfileIcon" title="Meu Perfil"></div>
-      <h1>ID1: Identidade Digital Evoluzion</h1>
+      <h1 id="headerTitle">ID1</h1> <!-- Título alterado para "ID1" -->
+      <div id="headerHourglass" class="header-hourglass">00h 00m 00s</div> <!-- Ampulheta Digital -->
     </div>
     <button id="logoutButton">Sair</button>
   </header>
@@ -363,7 +383,7 @@
         <button class="tab-button" data-tab="tvdt">TVDT</button>
       </div>
 
-      <!-- Aba: Visão Geral Global (NOVA ABA) -->
+      <!-- Aba: Visão Geral Global -->
       <div id="global-overview-content" class="tab-content hidden">
         <h2>Visão Geral Global
           <div class="info-icon-container">
@@ -607,6 +627,8 @@
     const saveProfileButton = document.getElementById("saveProfileButton");
     const logoutButton = document.getElementById("logoutButton");
     const headerProfileIcon = document.getElementById("headerProfileIcon");
+    const headerTitle = document.getElementById("headerTitle"); // Novo: Título do cabeçalho
+    const headerHourglass = document.getElementById("headerHourglass"); // Novo: Ampulheta digital
 
     // --- DOM Elements - Abas ---
     const tabButtons = document.querySelectorAll(".tab-button");
@@ -669,8 +691,9 @@
 
 
     let userBirthDate = null;
-    let pageLoadTime = 0;
-    let accumulatedDigitalScreenTimeMs = 0;
+    let accumulatedDigitalScreenTimeMs = 0; // Tempo total acumulado de uso do site (Firestore)
+    let sessionStartTime = 0; // Marca o início da sessão atual
+    let sessionTimerInterval; // Intervalo para o timer da sessão
     let userHasLoggedInOnce = false;
 
     // --- Funções de Utilitário de Data e Tempo ---
@@ -888,7 +911,7 @@
 
       const duration = formatMillisecondsToFullAge(tvtMs);
 
-      const theoreticalDeathDate = new Date(calmentDeathDate.getTime() + oneDayMs);
+      const theoreticalDeathDate = new Date(calmentBirthDate.getTime() + tvtMs); // Correção para usar tvtMs
       const tvtAgeExact = getExactAge(calmentBirthDate, theoreticalDeathDate);
 
       tvtYearsSpan.textContent = pad(tvtAgeExact.years);
@@ -900,57 +923,63 @@
       tvtMillisecondsSpan.textContent = pad(duration.milliseconds, 3);
     }
 
-    // --- TVDT (Tempo de Vida Destinado às Telas) ---
-    let tvdtInterval;
-    let currentSessionStartTime = 0;
-    let currentLoggedTimeMs = 0;
-    
-    function startScreenTimeTracking() {
-        if (currentSessionStartTime === 0) {
-            currentSessionStartTime = Date.now();
-        }
-        if (!tvdtInterval) {
-            tvdtInterval = setInterval(() => {
-                if (!document.hidden) {
-                    const now = Date.now();
-                    const elapsed = now - currentSessionStartTime;
-                    currentLoggedTimeMs += elapsed;
-                    currentSessionStartTime = now;
-
-                    displayTVDTData();
-                }
-            }, 100);
+    // --- TVDT (Tempo de Vida Destinado às Telas) - Lógica Global ---
+    function startSessionTracking() {
+        if (!sessionTimerInterval) { // Inicia apenas se não estiver já rodando
+            sessionStartTime = Date.now(); // Marca o início da sessão atual
+            sessionTimerInterval = setInterval(updateSessionDisplay, 100); // Atualiza a cada 100ms
         }
     }
 
-    function stopScreenTimeTracking() {
-        if (tvdtInterval) {
-            clearInterval(tvdtInterval);
-            tvdtInterval = null;
+    async function stopSessionTracking() {
+        if (sessionTimerInterval) {
+            clearInterval(sessionTimerInterval);
+            sessionTimerInterval = null;
         }
-        if (currentLoggedTimeMs > 0) {
-            accumulatedDigitalScreenTimeMs += currentLoggedTimeMs;
-        }
-        currentLoggedTimeMs = 0;
         
+        // Calcula o tempo da sessão atual e adiciona ao acumulado
+        const currentSessionDuration = Date.now() - sessionStartTime;
+        if (currentSessionDuration > 0) {
+            accumulatedDigitalScreenTimeMs += currentSessionDuration;
+        }
+        sessionStartTime = 0; // Reseta para a próxima sessão
+
+        // Salva o tempo acumulado no Firestore
         const user = auth.currentUser;
         if (user) {
-            updateDoc(doc(db, "users", user.uid), {
-                accumulatedDigitalScreenTimeMs: accumulatedDigitalScreenTimeMs
-            }).catch(error => {
-                console.error("Erro ao salvar tempo de tela:", error);
-            });
+            try {
+                await updateDoc(doc(db, "users", user.uid), {
+                    accumulatedDigitalScreenTimeMs: accumulatedDigitalScreenTimeMs
+                });
+                console.log("Tempo de tela salvo com sucesso no Firestore.");
+            } catch (error) {
+                console.error("Erro ao salvar tempo de tela no Firestore:", error);
+            }
+        }
+    }
+
+    function updateSessionDisplay() {
+        // Tempo da sessão atual
+        const currentSessionDuration = Date.now() - sessionStartTime;
+        const formattedSessionTime = formatMillisecondsToHMS(currentSessionDuration);
+        headerHourglass.textContent = `${pad(formattedSessionTime.hours)}h ${pad(formattedSessionTime.minutes)}m ${pad(formattedSessionTime.seconds)}s`;
+
+        // Atualiza a aba TVDT se estiver ativa
+        if (!document.getElementById('tvdt-content').classList.contains('hidden')) {
+            displayTVDTData();
         }
     }
 
     function displayTVDTData() {
-        const totalCurrentLoggedMs = accumulatedDigitalScreenTimeMs + currentLoggedTimeMs;
+        // Tempo Total Logado (acumulado de sessões anteriores + sessão atual)
+        const totalCurrentLoggedMs = accumulatedDigitalScreenTimeMs + (Date.now() - sessionStartTime);
         const loggedFormatted = formatMillisecondsToHMS(totalCurrentLoggedMs);
         loggedHoursSpan.textContent = pad(loggedFormatted.hours);
         loggedMinutesSpan.textContent = pad(loggedFormatted.minutes);
         loggedSecondsSpan.textContent = pad(loggedFormatted.seconds);
         loggedMillisecondsSpan.textContent = pad(loggedFormatted.milliseconds, 3);
 
+        // TVDT Calculado (Tempo Total Logado x 2)
         const tvdtCalculatedMs = totalCurrentLoggedMs * 2;
         const tvdtFormatted = formatMillisecondsToHMS(tvdtCalculatedMs);
         tvdtHoursSpan.textContent = pad(tvdtFormatted.hours);
@@ -958,6 +987,7 @@
         tvdtSecondsSpan.textContent = pad(tvdtFormatted.seconds);
         tvdtMillisecondsSpan.textContent = pad(tvdtFormatted.milliseconds, 3);
     }
+
 
     // --- Função para obter a contagem total de usuários registrados (para Visão Geral Global e TVT) ---
     async function updateTotalRegisteredUsersCount() {
@@ -1016,7 +1046,7 @@
         "NOR": "5.500.000", "DNK": "5.900.000", "FIN": "5.500.000", "POL": "37.000.000",
         "UKR": "37.000.000", "KOR": "51.000.000", "PRK": "26.000.000", "VNM": "99.000.000",
         "THA": "71.000.000", "PHL": "117.000.000", "TUR": "85.000.000", "IRN": "89.000.000",
-        "SAU": "36.000.000", "COL": "52.000.000", "PER": "34.000.000", "CHL": "19.000.000",
+        "SAU": "36.000.000", "COL": "52.0.000.000", "PER": "34.000.000", "CHL": "19.000.000",
         "VEN": "28.000.000", "CUB": "11.000.000", "GRC": "10.000.000", "PRT": "10.000.000",
         "CHE": "8.800.000", "AUT": "9.100.000", "IRL": "5.100.000", "NZL": "5.200.000",
         "EGY": "109.000.000", "KEN": "55.000.000", "ETH": "126.000.000", "CAN": "40.000.000"
@@ -1059,6 +1089,9 @@
         emailInput.value = user.email || "Não disponível";
         await loadUserProfile(user.uid);
         
+        // Inicia o rastreamento do tempo de sessão assim que o usuário está logado
+        startSessionTracking();
+
         // Define a aba 'Visão Geral Global' como ativa por padrão se o usuário já preencheu dados
         if (userHasLoggedInOnce) {
           document.querySelector('.tab-button[data-tab="global-overview"]').click();
@@ -1067,6 +1100,8 @@
           document.querySelector('.tab-button[data-tab="profile"]').click();
         }
       } else {
+        // Se deslogado, para o rastreamento e redireciona
+        stopSessionTracking(); // Garante que o tempo seja salvo antes de redirecionar
         window.location.href = "./index.html";
       }
     });
@@ -1092,6 +1127,7 @@
             userBirthDate = null;
           }
           
+          // Carrega o tempo de tela acumulado do Firestore
           accumulatedDigitalScreenTimeMs = currentUserData.accumulatedDigitalScreenTimeMs || 0;
 
           if (currentUserData.name && currentUserData.dateOfBirth) {
@@ -1168,10 +1204,10 @@
 
     // --- Sair (Logout) ---
     logoutButton.addEventListener("click", async () => {
-      stopScreenTimeTracking();
+      // stopSessionTracking() será chamado pelo onAuthStateChanged quando o usuário for null
       try {
         await signOut(auth);
-        window.location.href = "./index.html";
+        // O redirecionamento é feito pelo onAuthStateChanged
       } catch (error) {
         console.error("Erro ao sair:", error);
         statusText.innerText = `Erro ao sair: ${error.message}`;
@@ -1189,12 +1225,11 @@
         button.classList.add("active");
         document.getElementById(`${targetTab}-content`).classList.remove("hidden");
 
-        // Gerencia os intervalos dos relógios
+        // Gerencia os intervalos específicos de cada aba
         if (myLifeInterval) clearInterval(myLifeInterval);
         if (tvtInterval) clearInterval(tvtInterval);
-        stopScreenTimeTracking(); // Para e salva o tempo de tela ao trocar de aba
-        if (worldPopulationIntervalGlobal) clearInterval(worldPopulationIntervalGlobal); // Limpa o intervalo global
-        if (humanityAssetIntervalGlobal) clearInterval(humanityAssetIntervalGlobal); // Limpa o intervalo do ativo
+        if (worldPopulationIntervalGlobal) clearInterval(worldPopulationIntervalGlobal);
+        if (humanityAssetIntervalGlobal) clearInterval(humanityAssetIntervalGlobal);
 
         if (targetTab === 'tvv') {
           updateMyLifeClock();
@@ -1202,13 +1237,11 @@
         } else if (targetTab === 'tvt') {
           calculateAndDisplayTVT();
           updateTotalRegisteredUsersCount();
-          tvtInterval = setInterval(calculateAndDisplayTVT, 10);
+          tvtInterval = setInterval(calculateAndDisplayTVT, 10); // Mantém o TVT atualizando
         } else if (targetTab === 'tvdt') {
-            startScreenTimeTracking();
-            displayTVDTData();
+            displayTVDTData(); // Apenas exibe, o rastreamento é global
         } else if (targetTab === 'global-overview') {
             updateTotalRegisteredUsersCount();
-            // Inicia os intervalos para simular o "ao vivo" na aba global
             worldPopulationIntervalGlobal = setInterval(updateWorldPopulationDisplayGlobal, 100);
             humanityAssetIntervalGlobal = setInterval(displayHumanityAssetGlobal, 100);
         }
@@ -1224,13 +1257,13 @@
     document.addEventListener("DOMContentLoaded", () => {
       displayCalmentTribute();
       
-      // O onAuthStateChanged vai decidir qual aba abrir inicialmente
-      // E ele carrega os dados do perfil, incluindo accumulatedDigitalScreenTimeMs
+      // O onAuthStateChanged vai lidar com o carregamento do perfil e o início do rastreamento da sessão.
     });
 
     // --- Salvar tempo de tela acumulado ao fechar/navegar na página ---
-    window.addEventListener('beforeunload', () => {
-        stopScreenTimeTracking();
+    window.addEventListener('beforeunload', async () => {
+        // Garante que o tempo da sessão atual seja salvo antes de sair
+        await stopSessionTracking(); 
     });
 
   </script>
