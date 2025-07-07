@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Meu Perfil ID1</title>
+  
+  <link rel="manifest" href="/manifest.json">
+
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -603,8 +606,6 @@
       // Implementação para obter anos, meses, dias a partir de milissegundos
       // É mais preciso usar o cálculo de diferença de datas para anos/meses/dias
       // e então o restante em horas/minutos/segundos/ms.
-      // Para o TVV do usuário, já temos 'userBirthDate', então vamos usar getExactAge para A/M/D
-      // e o restante do tempo para H/M/S/MS do dia atual.
       // Esta função será para o TVT/TVDT que são apenas durações em MS.
 
       const days = Math.floor(ms / (1000 * 60 * 60 * 24));
@@ -696,9 +697,13 @@
 
       const duration = formatMillisecondsToFullAge(tvtMs);
 
-      tvtYearsSpan.textContent = getExactAge(calmentBirthDate, new Date(calmentDeathDate.getTime() + oneDayMs)).years;
-      tvtMonthsSpan.textContent = getExactAge(calmentBirthDate, new Date(calmentDeathDate.getTime() + oneDayMs)).months;
-      tvtDaysSpan.textContent = getExactAge(calmentBirthDate, new Date(calmentDeathDate.getTime() + oneDayMs)).days;
+      // Para exibir anos/meses/dias para TVT com "1 dia a mais" de forma precisa
+      const theoreticalDeathDate = new Date(calmentDeathDate.getTime() + oneDayMs);
+      const tvtAgeExact = getExactAge(calmentBirthDate, theoreticalDeathDate);
+
+      tvtYearsSpan.textContent = pad(tvtAgeExact.years);
+      tvtMonthsSpan.textContent = pad(tvtAgeExact.months);
+      tvtDaysSpan.textContent = pad(tvtAgeExact.days);
       tvtHoursSpan.textContent = pad(duration.hours);
       tvtMinutesSpan.textContent = pad(duration.minutes);
       tvtSecondsSpan.textContent = pad(duration.seconds);
@@ -712,7 +717,7 @@
     
     // Funções para lidar com o tempo de tela
     function startScreenTimeTracking() {
-        if (currentLoggedTimeMs === 0) { // Primeira vez na sessão ou reentrada
+        if (currentSessionStartTime === 0) { // Inicia apenas se não estiver já rodando
             currentSessionStartTime = Date.now();
         }
         if (!tvdtInterval) {
@@ -735,7 +740,10 @@
             tvdtInterval = null;
         }
         // Ao parar, adiciona o tempo da sessão atual ao total acumulado
-        accumulatedDigitalScreenTimeMs += currentLoggedTimeMs;
+        // Apenas se a sessão teve algum tempo
+        if (currentLoggedTimeMs > 0) {
+            accumulatedDigitalScreenTimeMs += currentLoggedTimeMs;
+        }
         currentLoggedTimeMs = 0; // Reseta para a sessão atual
         
         // Salva no Firestore
@@ -911,7 +919,6 @@
         // Gerencia os intervalos dos relógios
         if (myLifeInterval) clearInterval(myLifeInterval);
         if (tvtInterval) clearInterval(tvtInterval);
-        if (tvdtInterval) clearInterval(tvdtInterval);
         stopScreenTimeTracking(); // Para e salva o tempo de tela ao trocar de aba
 
         if (targetTab === 'tvv') {
@@ -947,6 +954,20 @@
         stopScreenTimeTracking(); // Garante que o tempo da sessão atual seja salvo
     });
 
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then((registration) => {
+            console.log('Service Worker registrado com sucesso:', registration.scope);
+          })
+          .catch((error) => {
+            console.error('Falha no registro do Service Worker:', error);
+          });
+      });
+    }
   </script>
 </body>
 </html>
