@@ -202,7 +202,7 @@
     const WORLD_POPULATION_ESTIMATE = 8100000000; // Estimativa de 8.1 bilhões (Julho de 2025)
     const JEANNE_CALMENT_LIFESPAN_DAYS = 44724; // 122 anos, 5 meses e 14 dias em dias
 
-    // --- Função para converter número para extenso em Português (mais robusta) ---
+    // --- Função para converter número para extenso em Português ---
     function numberToExtenso(num) {
         if (num === 0) return "zero";
         if (num < 0) return "menos " + numberToExtenso(Math.abs(num));
@@ -234,6 +234,7 @@
                 }
                 if (u > 0) {
                     if (s !== "" && (d !== 0 || c !== 0)) s += " e ";
+                    else if (s !== "" && d === 0 && c === 0 && n !== 0) s += " e "; // "e" para 101, 1001, etc.
                     s += unidades[u];
                 }
             }
