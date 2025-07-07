@@ -48,19 +48,64 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start; /* Alinha ao topo para as abas */
     }
-    .profile-card {
+
+    /* Estilos das Abas */
+    .tabs-container {
+      width: 100%;
+      max-width: 900px; /* Largura máxima para o conteúdo das abas */
       background: #ffffff;
-      padding: 30px;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 500px;
-      margin: 20px auto;
+      margin-top: 20px;
+    }
+
+    .tab-buttons {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+    }
+    .tab-button {
+      flex: 1;
+      padding: 15px 0;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #555;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .tab-button:hover {
+      color: #4a90e2;
+    }
+    .tab-button.active {
+      color: #4a90e2;
+      border-bottom: 3px solid #4a90e2;
+      background-color: #f9f9f9;
+    }
+
+    .tab-content {
+      padding: 30px;
       text-align: left;
     }
-    .profile-card h2 {
+    .tab-content.hidden {
+      display: none;
+    }
+
+    /* Estilos dos Cards (dentro das abas) */
+    .profile-card, .info-card {
+      background: #ffffff; /* Fundo branco, já está no .tabs-container */
+      padding: 0; /* Removido padding extra, já está no .tab-content */
+      border-radius: 8px; /* Já está no .tabs-container */
+      box-shadow: none; /* Removido sombra extra, já está no .tabs-container */
+      width: 100%;
+      max-width: 800px; /* Ajustado para caber dentro do tabs-container */
+      margin: 0 auto; /* Centraliza */
+      text-align: left;
+    }
+    .profile-card h2, .info-card h2 {
       color: #34495e;
       margin-bottom: 25px;
       text-align: center;
@@ -87,11 +132,11 @@
       font-size: 1rem;
     }
     input[type="email"][readonly] {
-      background-color: #f0f0f0; /* Fundo cinza para campos somente leitura */
+      background-color: #f0f0f0;
       cursor: not-allowed;
     }
     .button-save {
-      background: #28a745; /* Verde para salvar */
+      background: #28a745;
       color: white;
       border: none;
       padding: 12px 25px;
@@ -112,12 +157,12 @@
     .status-message {
       margin-top: 20px;
       font-size: 1rem;
-      color: #e74c3c; /* Vermelho para erros */
+      color: #e74c3c;
       text-align: center;
       font-weight: bold;
     }
     .success-message {
-        color: #27ae60; /* Verde para sucesso */
+        color: #27ae60;
     }
     footer {
       background: #2c3e50;
@@ -125,6 +170,87 @@
       padding: 1rem;
       margin-top: auto;
       box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* Estilo para o ícone de informação com popup */
+    .info-icon-container {
+      position: relative;
+      display: inline-block;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    .info-icon {
+      font-size: 1.2rem;
+      color: #4a90e2;
+      vertical-align: middle;
+    }
+    .info-popup {
+      visibility: hidden;
+      width: 250px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%; /* Acima do ícone */
+      left: 50%;
+      margin-left: -125px; /* Centraliza o popup */
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.9rem;
+    }
+    .info-popup::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #555 transparent transparent transparent;
+    }
+    .info-icon-container:hover .info-popup {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Estilos para a homenagem e relógios */
+    .tribute-section, .clock-section {
+      background: #fdfdfd;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+    .tribute-section h3, .clock-section h3 {
+      color: #34495e;
+      margin-bottom: 15px;
+      font-size: 1.6rem;
+    }
+    .tribute-details p, .clock-display {
+      font-size: 1.2rem;
+      color: #444;
+      margin-bottom: 5px;
+    }
+    .clock-display {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 1.8rem;
+      color: #2c3e50;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-top: 10px;
+      background: #e0e6ec;
+      padding: 10px;
+      border-radius: 5px;
+      display: inline-block; /* Para centralizar melhor */
+    }
+    .small-text {
+      font-size: 0.9rem;
+      color: #777;
     }
   </style>
 </head>
@@ -135,32 +261,108 @@
   </header>
 
   <main>
-    <div class="profile-card">
-      <h2>Meus Dados</h2>
-      <p id="status" class="status-message"></p>
-
-      <div class="form-group">
-        <label for="nameInput">Nome Completo:</label>
-        <input type="text" id="nameInput" placeholder="Seu Nome">
+    <div class="tabs-container">
+      <div class="tab-buttons">
+        <button class="tab-button active" data-tab="profile">Meu Perfil</button>
+        <button class="tab-button" data-tab="tvt">TVT (Tempo de Vida Total)</button>
+        <button class="tab-button" data-tab="tvdt">TVDT (Tempo de Vida Digital Total)</button>
+        <button class="tab-button" data-tab="documents">Carteira de Documentos</button>
       </div>
 
-      <div class="form-group">
-        <label for="emailInput">E-mail:</label>
-        <input type="email" id="emailInput" readonly>
-        <small style="color: #666; display: block; margin-top: 5px;">Este campo não pode ser alterado aqui.</small>
+      <div id="profile-content" class="tab-content">
+        <h2>Meus Dados
+          <div class="info-icon-container">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-popup">
+              Esta seção permite que você visualize e edite suas informações pessoais. Seus dados são armazenados de forma segura e utilizados para personalizar sua experiência.
+            </div>
+          </div>
+        </h2>
+        <p id="status" class="status-message"></p>
+
+        <div class="form-group">
+          <label for="nameInput">Nome Completo:</label>
+          <input type="text" id="nameInput" placeholder="Seu Nome">
+        </div>
+
+        <div class="form-group">
+          <label for="emailInput">E-mail:</label>
+          <input type="email" id="emailInput" readonly>
+          <small style="color: #666; display: block; margin-top: 5px;">Este campo não pode ser alterado aqui.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="dateOfBirthInput">Data de Nascimento:</label>
+          <input type="date" id="dateOfBirthInput">
+        </div>
+
+        <div class="form-group">
+          <label for="placeOfBirthInput">Local de Nascimento:</label>
+          <input type="text" id="placeOfBirthInput" placeholder="Cidade, País">
+        </div>
+
+        <button id="saveProfileButton" class="button-save">Salvar Perfil</button>
       </div>
 
-      <div class="form-group">
-        <label for="dateOfBirthInput">Data de Nascimento:</label>
-        <input type="date" id="dateOfBirthInput">
+      <div id="tvt-content" class="tab-content hidden">
+        <h2>TVT (Tempo de Vida Total)
+          <div class="info-icon-container">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-popup">
+              Aqui você pode ver uma contagem em tempo real de quanto tempo você viveu (se a data de nascimento estiver preenchida), além de uma homenagem à pessoa que mais viveu na história.
+            </div>
+          </div>
+        </h2>
+        <div class="tribute-section">
+          <h3>Homenagem a Jeanne Calment</h3>
+          <p>A pessoa com a vida mais longa verificada na história.</p>
+          <div class="tribute-details">
+            <p><strong>Nome:</strong> Jeanne Louise Calment</p>
+            <p><strong>Viveu:</strong> <span id="calmentYears"></span> anos, <span id="calmentMonths"></span> meses e <span id="calmentDays"></span> dias</p>
+            <p class="small-text">(Total de: <span id="calmentTotalYears"></span> anos | <span id="calmentTotalMonths"></span> meses | <span id="calmentTotalDays"></span> dias)</p>
+          </div>
+        </div>
+
+        <div class="tribute-section" id="myLifeCounterSection">
+          <h3>Seu Tempo de Vida Real</h3>
+          <p class="small-text">(Baseado na sua Data de Nascimento preenchida no Perfil)</p>
+          <div class="clock-display" id="myLifeClock">
+            <span id="myLifeYears">00</span>a <span id="myLifeMonths">00</span>m <span id="myLifeDays">00</span>d <span id="myLifeHours">00</span>h <span id="myLifeMinutes">00</span>m <span id="myLifeSeconds">00</span>s <span id="myLifeMilliseconds">000</span>ms
+          </div>
+          <p class="small-text" id="myLifeTotalDaysDisplay">Você já viveu um total de 0 dias.</p>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="placeOfBirthInput">Local de Nascimento:</label>
-        <input type="text" id="placeOfBirthInput" placeholder="Cidade, País">
+      <div id="tvdt-content" class="tab-content hidden">
+        <h2>TVDT (Tempo de Vida Digital Total)
+          <div class="info-icon-container">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-popup">
+              O TVDT representa o tempo total que você dedicou às suas interações e existência no mundo digital. Futuramente, poderá incluir o tempo de uso de apps, redes sociais, etc.
+            </div>
+          </div>
+        </h2>
+        <p>Este é o seu tempo de conexão com o universo digital. Sempre em constante evolução!</p>
+        <div class="clock-section">
+          <h3>Relógio Digital Universal</h3>
+          <div class="clock-display" id="digitalLifeClock">
+            00:00:00.000
+          </div>
+        </div>
       </div>
 
-      <button id="saveProfileButton" class="button-save">Salvar Perfil</button>
+      <div id="documents-content" class="tab-content hidden">
+        <h2>Carteira de Documentos
+          <div class="info-icon-container">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-popup">
+              Sua carteira digital para armazenar e gerenciar documentos importantes de forma segura e acessível, onde quer que você esteja. Recurso em desenvolvimento.
+            </div>
+          </div>
+        </h2>
+        <p>Sua carteira digital universal para documentos está em desenvolvimento.</p>
+        <p>Em breve, você poderá armazenar e acessar seus documentos de forma segura aqui.</p>
+      </div>
     </div>
   </main>
 
@@ -173,13 +375,12 @@
     import { 
       getAuth, 
       signOut, 
-      onAuthStateChanged // Para verificar o estado da autenticação
+      onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { 
       getFirestore, 
       doc, 
       getDoc, 
-      setDoc, 
       updateDoc 
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -196,7 +397,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // DOM Elements
+    // DOM Elements - Perfil
     const statusText = document.getElementById("status");
     const nameInput = document.getElementById("nameInput");
     const emailInput = document.getElementById("emailInput");
@@ -205,22 +406,158 @@
     const saveProfileButton = document.getElementById("saveProfileButton");
     const logoutButton = document.getElementById("logoutButton");
 
+    // DOM Elements - Abas
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    // DOM Elements - Homenagem Jeanne Calment
+    const calmentYearsSpan = document.getElementById("calmentYears");
+    const calmentMonthsSpan = document.getElementById("calmentMonths");
+    const calmentDaysSpan = document.getElementById("calmentDays");
+    const calmentTotalYearsSpan = document.getElementById("calmentTotalYears");
+    const calmentTotalMonthsSpan = document.getElementById("calmentTotalMonths");
+    const calmentTotalDaysSpan = document.getElementById("calmentTotalDays");
+
+    // DOM Elements - Seu Tempo de Vida
+    const myLifeCounterSection = document.getElementById("myLifeCounterSection");
+    const myLifeYearsSpan = document.getElementById("myLifeYears");
+    const myLifeMonthsSpan = document.getElementById("myLifeMonths");
+    const myLifeDaysSpan = document.getElementById("myLifeDays");
+    const myLifeHoursSpan = document.getElementById("myLifeHours");
+    const myLifeMinutesSpan = document.getElementById("myLifeMinutes");
+    const myLifeSecondsSpan = document.getElementById("myLifeSeconds");
+    const myLifeMillisecondsSpan = document.getElementById("myLifeMilliseconds");
+    const myLifeTotalDaysDisplay = document.getElementById("myLifeTotalDaysDisplay");
+
+    // DOM Elements - Relógio TVDT
+    const digitalLifeClock = document.getElementById("digitalLifeClock");
+
+    let userBirthDate = null; // Armazena a data de nascimento do usuário para o contador de vida
+
+    // --- Funções de Utilitário de Data ---
+    function pad(num) {
+      return num < 10 ? "0" + num : num;
+    }
+
+    // Calcula diferença entre duas datas em anos, meses e dias exatos
+    function getAge(birthDate, endDate) {
+      const start = new Date(birthDate);
+      const end = new Date(endDate);
+
+      let years = end.getFullYear() - start.getFullYear();
+      let months = end.getMonth() - start.getMonth();
+      let days = end.getDate() - start.getDate();
+
+      if (days < 0) {
+        months--;
+        days += new Date(end.getFullYear(), end.getMonth(), 0).getDate(); // Dias no mês anterior
+      }
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      return { years, months, days };
+    }
+
+    // Calcula total de dias, meses e anos
+    function getTotalDuration(startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        const diffTime = Math.abs(end - start); // Diferença em milissegundos
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffMonths = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + (end.getDate() >= start.getDate() ? 0 : -1);
+        const diffYears = end.getFullYear() - start.getFullYear() - ((end.getMonth() < start.getMonth() || (end.getMonth() === start.getMonth() && end.getDate() < start.getDate())) ? 1 : 0);
+        
+        return { totalYears: diffYears, totalMonths: diffMonths, totalDays: diffDays };
+    }
+
+    // --- Homenagem a Jeanne Calment ---
+    const calmentBirthDate = new Date("1875-02-21T00:00:00Z"); // UTC para evitar problemas de fuso horário
+    const calmentDeathDate = new Date("1997-08-04T00:00:00Z"); // UTC
+
+    function displayCalmentTribute() {
+      const age = getAge(calmentBirthDate, calmentDeathDate);
+      calmentYearsSpan.textContent = age.years;
+      calmentMonthsSpan.textContent = age.months;
+      calmentDaysSpan.textContent = age.days;
+
+      const totalDuration = getTotalDuration(calmentBirthDate, calmentDeathDate);
+      calmentTotalYearsSpan.textContent = totalDuration.totalYears;
+      calmentTotalMonthsSpan.textContent = totalDuration.totalMonths;
+      calmentTotalDaysSpan.textContent = totalDuration.totalDays;
+    }
+
+    // --- Relógio TVDT (Digital Universal) ---
+    function updateDigitalLifeClock() {
+      const now = new Date();
+      const hours = pad(now.getHours());
+      const minutes = pad(now.getMinutes());
+      const seconds = pad(now.getSeconds());
+      const milliseconds = pad(now.getMilliseconds(), 3); // Pad com 3 zeros
+
+      digitalLifeClock.textContent = `${hours}:${minutes}:${seconds}.${milliseconds}`;
+    }
+
+    // --- Contador de Vida do Usuário ---
+    function updateMyLifeClock() {
+      if (!userBirthDate) {
+        myLifeCounterSection.style.display = 'none'; // Esconde a seção se não houver data de nascimento
+        return;
+      } else {
+        myLifeCounterSection.style.display = 'block';
+      }
+
+      const now = new Date();
+      const diffMilliseconds = now - userBirthDate;
+
+      if (diffMilliseconds < 0) { // Caso a data de nascimento seja no futuro
+        myLifeClock.textContent = "Data futura!";
+        myLifeTotalDaysDisplay.textContent = "";
+        return;
+      }
+
+      // Calcula anos, meses, dias exatos
+      const ageExact = getAge(userBirthDate, now);
+      myLifeYearsSpan.textContent = pad(ageExact.years);
+      myLifeMonthsSpan.textContent = pad(ageExact.months);
+      myLifeDaysSpan.textContent = pad(ageExact.days);
+
+      // Calcula horas, minutos, segundos, milissegundos restantes do dia atual
+      let remainingMilliseconds = diffMilliseconds % (1000 * 60 * 60 * 24); // Milissegundos no dia atual
+
+      const hours = Math.floor(remainingMilliseconds / (1000 * 60 * 60));
+      remainingMilliseconds %= (1000 * 60 * 60);
+
+      const minutes = Math.floor(remainingMilliseconds / (1000 * 60));
+      remainingMilliseconds %= (1000 * 60);
+
+      const seconds = Math.floor(remainingMilliseconds / 1000);
+      const milliseconds = Math.floor(remainingMilliseconds % 1000);
+
+      myLifeHoursSpan.textContent = pad(hours);
+      myLifeMinutesSpan.textContent = pad(minutes);
+      myLifeSecondsSpan.textContent = pad(seconds);
+      myLifeMillisecondsSpan.textContent = pad(milliseconds, 3); // Pad para 3 dígitos
+
+      // Calcula e exibe o total de dias
+      const totalDuration = getTotalDuration(userBirthDate, now);
+      myLifeTotalDaysDisplay.textContent = `Você já viveu um total de ${totalDuration.totalDays} dias.`;
+    }
+
     // --- Listener de Autenticação ---
-    // Verifica se o usuário está logado. Se não estiver, redireciona para a página inicial.
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Usuário logado: Carrega os dados do perfil
-        emailInput.value = user.email || "Não disponível"; // Define o e-mail (apenas leitura)
+        emailInput.value = user.email || "Não disponível";
         await loadUserProfile(user.uid);
       } else {
-        // Usuário não logado: Redireciona para a página de login
         window.location.href = "./index.html";
       }
     });
 
     // --- Carregar Dados do Perfil ---
     async function loadUserProfile(uid) {
-      statusText.className = "status-message"; // Reset class
+      statusText.className = "status-message";
       statusText.innerText = "Carregando perfil...";
       try {
         const userRef = doc(db, "users", uid);
@@ -231,22 +568,22 @@
           nameInput.value = currentUserData.name || "";
           placeOfBirthInput.value = currentUserData.placeOfBirth || "";
 
-          // --- Tratamento da Data de Nascimento (importante para evitar o erro) ---
           if (currentUserData.dateOfBirth && typeof currentUserData.dateOfBirth.toDate === 'function') {
-            const date = currentUserData.dateOfBirth.toDate();
-            // Formata a data para YYYY-MM-DD para o input type="date"
-            dateOfBirthInput.value = date.toISOString().split('T')[0];
+            userBirthDate = currentUserData.dateOfBirth.toDate(); // Armazena para o contador de vida
+            dateOfBirthInput.value = userBirthDate.toISOString().split('T')[0];
           } else {
-            dateOfBirthInput.value = ""; // Limpa se não houver data válida ou for de tipo errado
+            dateOfBirthInput.value = "";
+            userBirthDate = null; // Reinicia se não for válida
           }
-          statusText.innerText = ""; // Limpa a mensagem de carregamento
+          statusText.innerText = "";
         } else {
           statusText.innerText = "Documento de perfil não encontrado. Crie um novo.";
-          // Se o documento não existe, os campos permanecem vazios para preenchimento
+          userBirthDate = null;
         }
       } catch (error) {
         console.error("Erro ao carregar perfil:", error);
         statusText.innerText = `Erro ao carregar perfil: ${error.message}`;
+        userBirthDate = null;
       }
     }
 
@@ -258,20 +595,17 @@
         return;
       }
 
-      statusText.className = "status-message"; // Reset class
+      statusText.className = "status-message";
       statusText.innerText = "Salvando perfil...";
       
       const updatedName = nameInput.value.trim();
       const updatedPlaceOfBirth = placeOfBirthInput.value.trim();
-      const dobString = dateOfBirthInput.value; // Recebe como string "YYYY-MM-DD"
+      const dobString = dateOfBirthInput.value;
 
-      // Converte a string da data para um objeto Date.
-      // O Firebase Firestore converterá este objeto Date em um Timestamp automaticamente.
       let updatedDateOfBirth = null;
       if (dobString) {
         try {
-          updatedDateOfBirth = new Date(dobString);
-          // Verificação básica para garantir que a data é válida
+          updatedDateOfBirth = new Date(dobString + "T00:00:00"); // Adiciona T00:00:00 para garantir que seja salva como UTC meia-noite
           if (isNaN(updatedDateOfBirth.getTime())) {
             throw new Error("Data de nascimento inválida.");
           }
@@ -285,11 +619,13 @@
         const userRef = doc(db, "users", user.uid);
         await updateDoc(userRef, {
           name: updatedName,
-          dateOfBirth: updatedDateOfBirth, // Passando um objeto Date ou null
+          dateOfBirth: updatedDateOfBirth,
           placeOfBirth: updatedPlaceOfBirth
         });
+        // Atualiza a variável userBirthDate após salvar com sucesso
+        userBirthDate = updatedDateOfBirth;
         statusText.innerText = "Perfil salvo com sucesso!";
-        statusText.className = "status-message success-message"; // Adiciona classe de sucesso
+        statusText.className = "status-message success-message";
       } catch (error) {
         console.error("Erro ao salvar perfil:", error);
         statusText.innerText = `Erro ao salvar perfil: ${error.message}`;
@@ -300,11 +636,65 @@
     logoutButton.addEventListener("click", async () => {
       try {
         await signOut(auth);
-        window.location.href = "./index.html"; // Redireciona para a página de login
+        window.location.href = "./index.html";
       } catch (error) {
         console.error("Erro ao sair:", error);
         statusText.innerText = `Erro ao sair: ${error.message}`;
       }
+    });
+
+    // --- Lógica das Abas ---
+    tabButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const targetTab = button.dataset.tab;
+
+        // Remove a classe 'active' de todos os botões e 'hidden' de todos os conteúdos
+        tabButtons.forEach(btn => btn.classList.remove("active"));
+        tabContents.forEach(content => content.classList.add("hidden"));
+
+        // Adiciona a classe 'active' ao botão clicado
+        button.classList.add("active");
+        // Remove a classe 'hidden' do conteúdo da aba correspondente
+        document.getElementById(`${targetTab}-content`).classList.remove("hidden");
+
+        // Atualiza os relógios apenas quando a aba correspondente está visível
+        if (targetTab === 'tvt') {
+          // Garante que o contador de vida seja inicializado/atualizado ao entrar na aba TVT
+          updateMyLifeClock(); // Chama para exibir ou esconder a seção
+          // Inicia os intervalos para TVT e TVDT apenas se ainda não estiverem ativos
+          if (!window.tvtInterval) {
+            window.tvtInterval = setInterval(updateMyLifeClock, 10);
+          }
+        } else {
+          // Limpa o intervalo do TVT se sair da aba
+          if (window.tvtInterval) {
+            clearInterval(window.tvtInterval);
+            window.tvtInterval = null;
+          }
+        }
+
+        if (targetTab === 'tvdt') {
+          if (!window.tvdtInterval) {
+            window.tvdtInterval = setInterval(updateDigitalLifeClock, 10);
+          }
+        } else {
+          // Limpa o intervalo do TVDT se sair da aba
+          if (window.tvdtInterval) {
+            clearInterval(window.tvdtInterval);
+            window.tvdtInterval = null;
+          }
+        }
+      });
+    });
+
+    // --- Inicialização ao Carregar a Página ---
+    document.addEventListener("DOMContentLoaded", () => {
+      displayCalmentTribute(); // Exibe a homenagem a Jeanne Calment
+
+      // Define a aba 'Meu Perfil' como ativa por padrão ao carregar
+      document.querySelector('.tab-button[data-tab="profile"]').click();
+      
+      // Os relógios serão iniciados quando as abas correspondentes forem clicadas.
     });
   </script>
 </body>
