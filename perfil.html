@@ -56,6 +56,7 @@
       transition: background-color 0.3s ease;
       display: inline-block;
       margin-top: 10px;
+      margin-right: 5px; /* Para botões lado a lado */
     }
     .button:hover {
       background-color: #357bd8;
@@ -70,9 +71,17 @@
     .danger-button:hover {
       background-color: #c0392b;
     }
+    .secondary-button {
+        background: #6c757d;
+    }
+    .secondary-button:hover {
+        background: #5a6268;
+    }
     input[type="date"],
     input[type="number"],
-    input[type="file"] {
+    input[type="file"],
+    input[type="text"],
+    select {
       width: calc(100% - 22px);
       padding: 10px;
       margin-bottom: 10px;
@@ -192,6 +201,10 @@
         border-radius: 4px;
         box-sizing: border-box;
     }
+    /* Estilos para o modo de edição de perfil */
+    .profile-display-mode { display: block; }
+    .profile-edit-mode { display: none; }
+    .profile-display-mode p, .profile-display-mode button { margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -205,10 +218,32 @@
       <div class="grid-2-cols">
         <div class="card">
           <h2>Dados do Perfil</h2>
-          <p><strong>Nome:</strong> <span id="userName"></span></p>
-          <p><strong>E-mail:</strong> <span id="userEmail"></span></p>
-          <p><strong>Membro desde:</strong> <span id="memberSince"></span></p>
-          <button id="logoutBtn" class="button danger-button">Sair</button>
+
+          <div id="profileDisplayMode" class="profile-display-mode">
+            <p><strong>Nome:</strong> <span id="userName"></span></p>
+            <p><strong>E-mail:</strong> <span id="userEmail"></span></p>
+            <p><strong>Método de Login:</strong> <span id="userLoginMethod"></span></p>
+            <p><strong>Membro desde:</strong> <span id="memberSince"></span></p>
+            <p><strong>Data de Nascimento:</strong> <span id="userDobDisplay"></span></p>
+            <p><strong>Local de Nascimento:</strong> <span id="userPobDisplay"></span></p>
+            <button id="editProfileBtn" class="button">Editar Perfil</button>
+            <button id="logoutBtn" class="button danger-button">Sair</button>
+          </div>
+
+          <div id="profileEditMode" class="profile-edit-mode">
+            <label for="editNameInput">Nome:</label>
+            <input type="text" id="editNameInput" placeholder="Seu nome completo">
+
+            <label for="editDobInput">Data de Nascimento:</label>
+            <input type="date" id="editDobInput">
+
+            <label for="editPobInput">Local de Nascimento:</label>
+            <input type="text" id="editPobInput" placeholder="Cidade, País">
+
+            <button id="saveProfileBtn" class="button">Salvar Alterações</button>
+            <button id="cancelEditBtn" class="button secondary-button">Cancelar</button>
+            <p id="editProfileStatus" style="font-size: 0.9em; color: #7f8c8d; margin-top: 5px;"></p>
+          </div>
         </div>
 
         <div class="card">
@@ -292,7 +327,7 @@
   <script type="module">
     // Importações do Firebase SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
@@ -314,16 +349,30 @@
     const storage = getStorage(app);
 
     // --- Constantes Globais ---
-    // Recorde mundial de longevidade (Jeanne Calment): 122 anos e 164 dias
-    // Calculado como 44724 dias.
-    const TVT_BASE_DAYS = 44724; 
+    const TVT_BASE_DAYS = 44724; // Jeanne Calment: 122 anos e 164 dias
     const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
     // --- Elementos DOM ---
+    // Display Mode
     const userNameElem = document.getElementById("userName");
     const userEmailElem = document.getElementById("userEmail");
+    const userLoginMethodElem = document.getElementById("userLoginMethod"); // NOVO
     const memberSinceElem = document.getElementById("memberSince");
+    const userDobDisplay = document.getElementById("userDobDisplay"); // NOVO
+    const userPobDisplay = document.getElementById("userPobDisplay"); // NOVO
+    const editProfileBtn = document.getElementById("editProfileBtn"); // NOVO
     const logoutBtn = document.getElementById("logoutBtn");
+
+    // Edit Mode
+    const profileDisplayMode = document.getElementById("profileDisplayMode"); // NOVO
+    const profileEditMode = document.getElementById("profileEditMode");     // NOVO
+    const editNameInput = document.getElementById("editNameInput");       // NOVO
+    const editDobInput = document.getElementById("editDobInput");         // NOVO
+    const editPobInput = document.getElementById("editPobInput");         // NOVO
+    const saveProfileBtn = document.getElementById("saveProfileBtn");     // NOVO
+    const cancelEditBtn = document.getElementById("cancelEditBtn");       // NOVO
+    const editProfileStatus = document.getElementById("editProfileStatus"); // NOVO
+
     const loadingMessage = document.getElementById("loadingMessage");
     const errorMessage = document.getElementById("errorMessage");
     const profileContent = document.getElementById("profileContent");
@@ -348,17 +397,17 @@
     const proofOfLifeBtn = document.getElementById("proofOfLifeBtn");
     const proofOfLifeStatus = document.getElementById("proofOfLifeStatus");
 
-    // Modal Data de Nascimento
+    // Modal Data de Nascimento (ainda existe para o primeiro preenchimento obrigatório)
     const dobModal = document.getElementById("dobModal");
     const dobInput = document.getElementById("dobInput");
     const saveDobBtn = document.getElementById("saveDobBtn");
     const dobStatus = document.getElementById("dobStatus");
 
-    let currentUser = null; // Variável para armazenar o usuário logado
+    let currentUserData = null; // Variável para armazenar os dados do usuário logado do Firestore
 
     // --- Funções de Utilidade ---
 
-    // Exibir mensagem de erro na página
+    // Exibir mensagem de erro na página principal
     function showPageErrorMessage(message) {
       loadingMessage.style.display = 'none';
       profileContent.style.display = 'none';
@@ -369,7 +418,7 @@
     // Calcular dias vividos
     function calculateDaysLived(dateOfBirth) {
         if (!dateOfBirth) return 0;
-        const birthDate = new Date(dateOfBirth);
+        const birthDate = dateOfBirth instanceof Date ? birthDate : new Date(dateOfBirth);
         const today = new Date();
         const diffTime = Math.abs(today.getTime() - birthDate.getTime());
         return Math.ceil(diffTime / MS_PER_DAY);
@@ -385,6 +434,18 @@
         return `${hours}h ${minutes}m ${seconds}s`;
     }
 
+    // Obter o método de login
+    function getLoginMethod(user) {
+        if (user.isAnonymous) return "Anônimo";
+        if (user.providerData && user.providerData.length > 0) {
+            const providerIds = user.providerData.map(p => p.providerId);
+            if (providerIds.includes("google.com")) return "Google";
+            if (providerIds.includes("password")) return "E-mail/Senha";
+            if (providerIds.includes("phone")) return "Smartphone";
+        }
+        return "Desconhecido";
+    }
+
     // --- Funções de Interação com Firebase ---
 
     // Função para buscar e exibir dados do perfil e ampulheta digital
@@ -394,15 +455,24 @@
 
         if (userSnap.exists()) {
             const userData = userSnap.data();
-            currentUser = userData; // Salva os dados do usuário globalmente
+            currentUserData = userData; // Salva os dados do usuário globalmente
 
-            userNameElem.innerText = userData.name || "Não informado";
-            userEmailElem.innerText = userData.email || "Não informado";
+            // Exibe dados no modo de visualização
+            userNameElem.innerText = userData.name || user.displayName || "Não informado";
+            userEmailElem.innerText = userData.email || user.email || "Não informado";
+            userLoginMethodElem.innerText = getLoginMethod(user);
             memberSinceElem.innerText = userData.createdAt ? new Date(userData.createdAt.toDate()).toLocaleDateString() : "N/A";
+            userDobDisplay.innerText = userData.dateOfBirth ? new Date(userData.dateOfBirth.toDate()).toLocaleDateString() : "Não informado";
+            userPobDisplay.innerText = userData.placeOfBirth || "Não informado";
 
-            // --- Gerenciamento da Data de Nascimento ---
+            // Preenche inputs para o modo de edição
+            editNameInput.value = userData.name || user.displayName || "";
+            editDobInput.value = userData.dateOfBirth ? new Date(userData.dateOfBirth.toDate()).toISOString().split('T')[0] : "";
+            editPobInput.value = userData.placeOfBirth || "";
+
+            // --- Gerenciamento da Data de Nascimento no primeiro login/preenchimento ---
             if (!userData.dateOfBirth) {
-                dobModal.style.display = 'flex'; // Exibe o modal
+                dobModal.style.display = 'flex'; // Exibe o modal para preencher a DOB
             } else {
                 dobModal.style.display = 'none'; // Esconde o modal se já tiver
                 updateDigitalHourglassDisplay(userData);
@@ -433,24 +503,122 @@
         tvdtTokenValueDisplay.innerText = formatSeconds(tvdtTokenValueSeconds);
     }
 
-    // Função para salvar a data de nascimento
+    // --- Edição de Perfil ---
+    editProfileBtn.addEventListener("click", () => {
+        profileDisplayMode.style.display = 'none';
+        profileEditMode.style.display = 'block';
+        editProfileStatus.innerText = ""; // Limpa status anterior
+    });
+
+    cancelEditBtn.addEventListener("click", () => {
+        profileDisplayMode.style.display = 'block';
+        profileEditMode.style.display = 'none';
+    });
+
+    saveProfileBtn.addEventListener("click", async () => {
+        if (!currentUserData || !auth.currentUser) {
+            editProfileStatus.innerText = "Erro: Usuário não logado.";
+            return;
+        }
+
+        const newName = editNameInput.value.trim();
+        const newDob = editDobInput.value;
+        const newPob = editPobInput.value.trim();
+
+        editProfileBtn.disabled = true; // Desabilita botões durante o salvamento
+        saveProfileBtn.disabled = true;
+        cancelEditBtn.disabled = true;
+        editProfileStatus.innerText = "Salvando...";
+
+        try {
+            const userAuth = auth.currentUser;
+            const userDocRef = doc(db, "users", userAuth.uid);
+
+            const updates = {};
+            let authProfileUpdateNeeded = false;
+
+            // Atualiza nome no Firebase Auth (se mudou)
+            if (newName !== (userAuth.displayName || currentUserData.name)) {
+                await updateProfile(userAuth, { displayName: newName });
+                updates.name = newName; // Também salva no Firestore
+                authProfileUpdateNeeded = true;
+            } else {
+                updates.name = currentUserData.name; // Garante que o nome atual seja salvo no Firestore
+            }
+
+
+            // Atualiza Data de Nascimento no Firestore
+            if (newDob) {
+                updates.dateOfBirth = new Date(newDob);
+            } else {
+                 // Se o campo for esvaziado, pode querer remover ou deixar como está
+                 // updates.dateOfBirth = null; // Para remover
+                 if (currentUserData.dateOfBirth) updates.dateOfBirth = currentUserData.dateOfBirth; // Mantém o anterior se vazio
+            }
+
+            // Atualiza Local de Nascimento no Firestore
+            if (newPob) {
+                updates.placeOfBirth = newPob;
+            } else {
+                // updates.placeOfBirth = null; // Para remover
+                if (currentUserData.placeOfBirth) updates.placeOfBirth = currentUserData.placeOfBirth; // Mantém o anterior se vazio
+            }
+            
+            await updateDoc(userDocRef, updates);
+            
+            // Atualiza currentUserData localmente com as novas informações para refletir imediatamente
+            currentUserData = { ...currentUserData, ...updates };
+
+            editProfileStatus.innerText = "Perfil atualizado com sucesso!";
+            
+            // Atualiza a exibição no modo de visualização
+            userNameElem.innerText = currentUserData.name || userAuth.displayName || "Não informado";
+            userDobDisplay.innerText = currentUserData.dateOfBirth ? new Date(currentUserData.dateOfBirth.toDate()).toLocaleDateString() : "Não informado";
+            userPobDisplay.innerText = currentUserData.placeOfBirth || "Não informado";
+            
+            // Se o nome foi atualizado no Auth, o displayName do objeto userAuth já estará atualizado
+            if (authProfileUpdateNeeded) {
+                userAuth.reload(); // Recarrega o objeto userAuth para garantir que displayname esteja atualizado
+            }
+
+
+            // Volta para o modo de visualização
+            setTimeout(() => {
+                profileDisplayMode.style.display = 'block';
+                profileEditMode.style.display = 'none';
+                editProfileStatus.innerText = "";
+            }, 1500); // Dá um tempo para o usuário ver a mensagem de sucesso
+
+        } catch (error) {
+            console.error("Erro ao salvar perfil:", error);
+            editProfileStatus.innerText = `Erro ao salvar perfil: ${error.message}`;
+        } finally {
+            editProfileBtn.disabled = false;
+            saveProfileBtn.disabled = false;
+            cancelEditBtn.disabled = false;
+        }
+    });
+
+
+    // Função para salvar a data de nascimento (do modal de primeiro preenchimento)
     saveDobBtn.addEventListener("click", async () => {
         const dob = dobInput.value;
         if (!dob) {
             dobStatus.innerText = "Por favor, selecione uma data.";
             return;
         }
-        if (!currentUser || !currentUser.uid) {
+        if (!currentUserData || !currentUserData.uid) {
             dobStatus.innerText = "Erro: Usuário não identificado. Recarregue a página.";
             return;
         }
 
         try {
-            await updateDoc(doc(db, "users", currentUser.uid), {
+            await updateDoc(doc(db, "users", currentUserData.uid), {
                 dateOfBirth: new Date(dob) // Salva como timestamp do Firebase
             });
-            currentUser.dateOfBirth = new Date(dob); // Atualiza o objeto local
-            updateDigitalHourglassDisplay(currentUser);
+            currentUserData.dateOfBirth = new Date(dob); // Atualiza o objeto local
+            updateDigitalHourglassDisplay(currentUserData);
+            userDobDisplay.innerText = new Date(currentUserData.dateOfBirth.toDate()).toLocaleDateString(); // Atualiza a exibição
             dobModal.style.display = 'none';
             dobStatus.innerText = "";
         } catch (error) {
@@ -459,9 +627,9 @@
         }
     });
 
-    // Função para registrar tempo de tela
+    // Função para registrar tempo de tela (continua igual)
     recordScreenTimeBtn.addEventListener("click", async () => {
-        if (!currentUser || !currentUser.uid) {
+        if (!currentUserData || !currentUserData.uid) {
             screenTimeStatus.innerText = "Erro: Usuário não logado.";
             return;
         }
@@ -477,9 +645,9 @@
         screenTimeStatus.innerText = "Registrando...";
 
         try {
-            const userDocRef = doc(db, "users", currentUser.uid);
+            const userDocRef = doc(db, "users", currentUserData.uid);
             // Incrementa o tempo de tela existente
-            const currentScreenTimeSeconds = currentUser.tvdt_screen_time_seconds || 0;
+            const currentScreenTimeSeconds = currentUserData.tvdt_screen_time_seconds || 0;
             const newScreenTimeSeconds = currentScreenTimeSeconds + screenTimeSeconds;
 
             await updateDoc(userDocRef, {
@@ -487,8 +655,8 @@
                 last_tvdt_update: new Date()
             });
 
-            currentUser.tvdt_screen_time_seconds = newScreenTimeSeconds; // Atualiza localmente
-            updateDigitalHourglassDisplay(currentUser); // Atualiza a exibição
+            currentUserData.tvdt_screen_time_seconds = newScreenTimeSeconds; // Atualiza localmente
+            updateDigitalHourglassDisplay(currentUserData); // Atualiza a exibição
 
             screenTimeStatus.innerText = "Tempo registrado com sucesso!";
             screenTimeInput.value = ""; // Limpa o input
@@ -500,10 +668,9 @@
         }
     });
 
-
-    // Função para upload de documentos
+    // Função para upload de documentos (continua igual)
     uploadDocumentBtn.addEventListener("click", async () => {
-        if (!currentUser || !currentUser.uid) {
+        if (!currentUserData || !currentUserData.uid) {
             uploadStatus.innerText = "Erro: Usuário não logado.";
             return;
         }
@@ -525,7 +692,7 @@
 
         try {
             // Cria um caminho único no Storage
-            const storagePath = `users/${currentUser.uid}/documents/${documentType}_${Date.now()}_${file.name}`;
+            const storagePath = `users/${currentUserData.uid}/documents/${documentType}_${Date.now()}_${file.name}`;
             const storageRef = ref(storage, storagePath);
 
             // Faz o upload do arquivo
@@ -533,7 +700,7 @@
             const downloadURL = await getDownloadURL(snapshot.ref);
 
             // Salva os metadados no Firestore
-            const documentsCollectionRef = collection(db, "users", currentUser.uid, "documents");
+            const documentsCollectionRef = collection(db, "users", currentUserData.uid, "documents");
             await setDoc(doc(documentsCollectionRef), { // Adiciona um novo documento com ID automático
                 type: documentType,
                 filename: file.name,
@@ -546,7 +713,7 @@
             uploadStatus.innerText = "Documento enviado com sucesso!";
             documentUploadInput.value = ""; // Limpa o input do arquivo
             documentTypeSelect.value = ""; // Limpa o tipo selecionado
-            loadUserDocuments(currentUser.uid); // Recarrega a lista de documentos
+            loadUserDocuments(currentUserData.uid); // Recarrega a lista de documentos
         } catch (error) {
             console.error("Erro ao fazer upload:", error);
             uploadStatus.innerText = `Erro ao fazer upload: ${error.message}`;
@@ -555,7 +722,7 @@
         }
     });
 
-    // Função para carregar e exibir documentos do usuário
+    // Função para carregar e exibir documentos do usuário (continua igual)
     async function loadUserDocuments(uid) {
         uploadedDocumentsList.innerHTML = '<li>Carregando documentos... <span class="spinner"></span></li>';
         const documentsCollectionRef = collection(db, "users", uid, "documents");
@@ -584,9 +751,9 @@
         }
     }
 
-    // Função para Realizar Prova de Vida
+    // Função para Realizar Prova de Vida (continua igual)
     proofOfLifeBtn.addEventListener("click", async () => {
-        if (!currentUser || !currentUser.uid) {
+        if (!currentUserData || !currentUserData.uid) {
             proofOfLifeStatus.innerText = "Erro: Usuário não logado.";
             return;
         }
@@ -595,26 +762,26 @@
         proofOfLifeStatus.innerText = "Realizando prova de vida...";
 
         try {
-            const userDocRef = doc(db, "users", currentUser.uid);
+            const userDocRef = doc(db, "users", currentUserData.uid);
             // Incrementa tvt_bonus_days em 1
-            const currentBonusDays = currentUser.tvt_bonus_days || 0;
+            const currentBonusDays = currentUserData.tvt_bonus_days || 0;
             const newBonusDays = currentBonusDays + 1;
 
             await updateDoc(userDocRef, {
                 tvt_bonus_days: newBonusDays
             });
-            currentUser.tvt_bonus_days = newBonusDays; // Atualiza o objeto local
+            currentUserData.tvt_bonus_days = newBonusDays; // Atualiza o objeto local
 
             // Registra o log da prova
-            const proofsLogsCollectionRef = collection(db, "users", currentUser.uid, "proofs_logs");
+            const proofsLogsCollectionRef = collection(db, "users", currentUserData.uid, "proofs_logs");
             await setDoc(doc(proofsLogsCollectionRef), {
                 type: "proof_of_life",
                 timestamp: new Date(),
                 details: { days_added: 1, method: "manual_click" }, // Pode ser expandido com métodos de verificação reais
-                tvt_snapshot_at_event: TVT_BASE_DAYS + calculateDaysLived(currentUser.dateOfBirth) + newBonusDays
+                tvt_snapshot_at_event: TVT_BASE_DAYS + calculateDaysLived(currentUserData.dateOfBirth) + newBonusDays
             });
 
-            updateDigitalHourglassDisplay(currentUser); // Atualiza a exibição
+            updateDigitalHourglassDisplay(currentUserData); // Atualiza a exibição
             proofOfLifeStatus.innerText = "Prova de vida realizada! +1 dia de valor atribuído!";
         } catch (error) {
             console.error("Erro ao realizar prova de vida:", error);
