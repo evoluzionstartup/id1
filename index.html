@@ -150,13 +150,13 @@
       <ul>
         <li><a href="https://www.un.org/development/desa/pd/content/world-population-prospects" target="_blank" rel="noopener noreferrer">Nações Unidas (ONU) - World Population Prospects</a></li>
         <li><a href="https://data.worldbank.org/indicator/SP.POP.TOTL" target="_blank" rel="noopener noreferrer">Banco Mundial - População Total</a></li>
-        <li><a href="https://www.worldometers.info/world-population/" target="_blank" rel="noopener noreferrer">Worldometer - Contador de População Mundial</a></li>
+        <li><a href="https://www.worldometers.info/br/" target="_blank" rel="noopener noreferrer">Worldometer - Contador de População Mundial (em tempo real)</a></li>
       </ul>
     </div>
 
     <div class="section-card">
       <h2>O Maior Ativo da Humanidade</h2>
-      <p>Considerando que cada humano tenha o mínimo de tempo de vida atribuído de 122 anos, 5 meses e 14 dias (44724 dias), o potencial de vida total da humanidade é:</p>
+      <p>Considerando que cada humano tenha o mínimo de tempo de vida atribuído de 122 anos, 5 meses e 14 dias (44724 dias), referência à vida de **Jeanne Louise Calment**, a pessoa com a vida mais longa verificada na história, o potencial de vida total da humanidade é:</p>
       <span id="humanityAssetNumber" class="highlight-number">Calculando...</span>
       <p id="humanityAssetExtenso" class="number-extenso"></p>
       <p style="text-align: center; font-size: 1.2rem; font-weight: bold; color: #28a745; margin-top: 20px;">
@@ -199,10 +199,16 @@
     const provider = new GoogleAuthProvider();
 
     // --- Constantes para o cálculo ---
-    const WORLD_POPULATION_ESTIMATE = 8100000000; // Estimativa de 8.1 bilhões (Julho de 2025)
+    // Estimativa de 8.233.166.345 em 07/07/2025 00:00:00 -03:00 (Hora local de Araucária)
+    // Aumenta em aproximadamente 2.5 pessoas por segundo globalmente
+    const INITIAL_WORLD_POPULATION_ESTIMATE = 8233166345; 
+    const POPULATION_GROWTH_PER_SECOND = 2.5; // Estimativa de crescimento líquido global por segundo
     const JEANNE_CALMENT_LIFESPAN_DAYS = 44724; // 122 anos, 5 meses e 14 dias em dias
 
-    // --- Função para converter número para extenso em Português ---
+    let currentWorldPopulation = INITIAL_WORLD_POPULATION_ESTIMATE;
+    let lastUpdateTime = Date.now();
+
+    // --- Função para converter número para extenso em Português (mais robusta) ---
     function numberToExtenso(num) {
         if (num === 0) return "zero";
         if (num < 0) return "menos " + numberToExtenso(Math.abs(num));
@@ -234,7 +240,7 @@
                 }
                 if (u > 0) {
                     if (s !== "" && (d !== 0 || c !== 0)) s += " e ";
-                    else if (s !== "" && d === 0 && c === 0 && n !== 0) s += " e "; // "e" para 101, 1001, etc.
+                    else if (s !== "" && d === 0 && c === 0 && n !== 0) s += " e ";
                     s += unidades[u];
                 }
             }
@@ -251,7 +257,7 @@
         let resultado = [];
         for (let i = 0; i < chunks.length; i++) {
             let chunk = chunks[i];
-            if (chunk === 0 && chunks.length > 1 && i !== chunks.length -1) continue; // Pula zeros intermediários
+            if (chunk === 0 && chunks.length > 1 && i !== chunks.length -1) continue;
 
             let textoChunk = converterChunk(chunk);
             let grandeza = grandezas[chunks.length - 1 - i];
@@ -262,7 +268,7 @@
                         resultado.push(textoChunk + " " + grandeza[0]);
                     } else if (chunk > 1 && grandeza[1] !== "") {
                         resultado.push(textoChunk + " " + grandeza[1]);
-                    } else { // Para "mil" ou quando não há plural
+                    } else {
                         resultado.push(textoChunk + (grandeza[0] ? " " + grandeza[0] : ""));
                     }
                 } else {
@@ -318,10 +324,19 @@
       }
     }
 
+    // --- Função para simular e exibir a população mundial em tempo real ---
+    function updateWorldPopulationDisplay() {
+        const now = Date.now();
+        const elapsedTime = (now - lastUpdateTime) / 1000; // Tempo em segundos desde a última atualização
+        currentWorldPopulation += POPULATION_GROWTH_PER_SECOND * elapsedTime;
+        lastUpdateTime = now;
+        worldPopulationDisplay.textContent = Math.floor(currentWorldPopulation).toLocaleString('pt-BR');
+    }
+
     // --- Função para calcular e exibir o "Maior Ativo da Humanidade" ---
     function displayHumanityAsset() {
-        const totalAssetDays = WORLD_POPULATION_ESTIMATE * JEANNE_CALMENT_LIFESPAN_DAYS;
-        humanityAssetNumber.textContent = totalAssetDays.toLocaleString('pt-BR') + " dias"; // Formata com separador de milhares
+        const totalAssetDays = Math.floor(currentWorldPopulation) * JEANNE_CALMENT_LIFESPAN_DAYS;
+        humanityAssetNumber.textContent = totalAssetDays.toLocaleString('pt-BR') + " dias";
         humanityAssetExtenso.textContent = numberToExtenso(totalAssetDays) + " dias";
     }
 
@@ -333,8 +348,9 @@
       } else {
         // Se não estiver logado, atualiza a contagem e exibe os dados da página inicial
         updateUserCount();
-        worldPopulationDisplay.textContent = WORLD_POPULATION_ESTIMATE.toLocaleString('pt-BR');
-        displayHumanityAsset();
+        // Inicia a simulação da população mundial
+        setInterval(updateWorldPopulationDisplay, 100); // Atualiza a cada 100ms
+        setInterval(displayHumanityAsset, 100); // Atualiza o ativo da humanidade junto
       }
     });
 
