@@ -340,32 +340,6 @@
       white-space: nowrap; /* Não quebra linha */
       box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
-    /* Ranking de países */
-    .country-ranking {
-        margin-top: 30px;
-        text-align: center;
-    }
-    .country-ranking ol {
-        list-style: decimal;
-        padding: 0;
-        margin: 0 auto;
-        max-width: 400px; /* Limita a largura da lista */
-        text-align: left;
-    }
-    .country-ranking li {
-        padding: 8px 0;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .country-ranking li:last-child {
-        border-bottom: none;
-    }
-    .country-ranking li span {
-        font-weight: bold;
-        color: #34495e;
-    }
 
   </style>
 </head>
@@ -410,19 +384,18 @@
           <h3>População Mundial</h3>
           <p>A população humana é o nosso maior recurso. Estimamos a população atual do planeta em:</p>
           <span id="worldPopulationDisplayGlobal" class="highlight-number">Carregando...</span>
-          <p class="small-text">Este é um contador simulado, atualizado a cada milissegundo.</p>
           
           <h4>Fontes de Consulta:</h4>
           <ul>
             <li><a href="https://www.un.org/development/desa/pd/content/world-population-prospects" target="_blank" rel="noopener noreferrer">Nações Unidas (ONU) - World Population Prospects</a></li>
             <li><a href="https://data.worldbank.org/indicator/SP.POP.TOTL" target="_blank" rel="noopener noreferrer">Banco Mundial - População Total</a></li>
-            <li><a href="https://www.worldometers.info/world-population/" target="_blank" rel="noopener noreferrer">Worldometer - Contador de População Mundial</a></li>
+            <li><a href="https://www.worldometers.info/br/" target="_blank" rel="noopener noreferrer">Worldometer - Contador de População Mundial (em tempo real)</a></li>
           </ul>
         </div>
 
         <div class="section-card">
-          <h3>O Maior Ativo da Humanidade</h3>
-          <p>Considerando que cada humano tenha o mínimo de tempo de vida atribuído de 122 anos, 5 meses e 14 dias (44724 dias), o potencial de vida total da humanidade é:</p>
+          <h2>O Maior Ativo da Humanidade</h2>
+          <p>Considerando que cada humano tenha o mínimo de tempo de vida atribuído de 122 anos, 5 meses e 14 dias (44724 dias), referência à vida de **Jeanne Louise Calment**, a pessoa com a vida mais longa verificada na história, o potencial de vida total da humanidade é:</p>
           <span id="humanityAssetNumberGlobal" class="highlight-number">Calculando...</span>
           <p id="humanityAssetExtensoGlobal" class="number-extenso"></p>
           <p style="text-align: center; font-size: 1.2rem; font-weight: bold; color: #28a745; margin-top: 20px;">
@@ -432,16 +405,9 @@
 
         <div class="section-card">
           <h3>Mapa Mundial Interativo</h3>
-          <p class="small-text">Clique em um país para ver sua população (dados periodicamente atualizados).</p>
+          <p class="small-text">Clique em um país para ver sua população (dados de exemplo).</p>
           <div id="world-map-container">
             <div id="country-info-box"></div>
-          </div>
-          <div class="country-ranking">
-            <h3>Ranking dos Países Mais Populosos (Estimativa)</h3>
-            <p class="small-text">Dados baseados em estimativas recentes.</p>
-            <ol id="countryRankingList">
-              <!-- O ranking será preenchido via JavaScript -->
-            </ol>
           </div>
         </div>
       </div>
@@ -622,14 +588,15 @@
     const db = getFirestore(app);
 
     // --- Constantes para o cálculo global ---
-    // Estimativa inicial da população mundial (aproximadamente 8.1 bilhões)
-    let WORLD_POPULATION_LIVE_ESTIMATE = 8100000000; 
-    // Taxa de incremento para simular o contador vivo (ajuste conforme desejar)
-    // A população mundial aumenta em ~2.5 pessoas por segundo.
-    // 2.5 pessoas/segundo = 0.0025 pessoas/milissegundo
-    const WORLD_POPULATION_INCREMENT_PER_MS = 0.0025; 
-
+    // Estimativa de 8.233.166.345 em 07/07/2025 00:00:00 -03:00 (Hora local de Araucária)
+    // Aumenta em aproximadamente 2.5 pessoas por segundo globalmente
+    const INITIAL_WORLD_POPULATION_ESTIMATE = 8233166345; 
+    const POPULATION_GROWTH_PER_SECOND = 2.5; // Estimativa de crescimento líquido global por segundo
     const JEANNE_CALMENT_LIFESPAN_DAYS = 44724; // 122 anos, 5 meses e 14 dias em dias
+
+    let currentWorldPopulationGlobal = INITIAL_WORLD_POPULATION_ESTIMATE;
+    let lastUpdateTimeGlobal = Date.now();
+
 
     // --- DOM Elements - Perfil ---
     const statusText = document.getElementById("status");
@@ -651,7 +618,6 @@
     const humanityAssetNumberGlobal = document.getElementById("humanityAssetNumberGlobal");
     const humanityAssetExtensoGlobal = document.getElementById("humanityAssetExtensoGlobal");
     const countryInfoBox = document.getElementById("country-info-box");
-    const countryRankingList = document.getElementById("countryRankingList");
 
 
     // --- DOM Elements - Homenagem Jeanne Calment (no TVV) ---
@@ -706,7 +672,6 @@
     let pageLoadTime = 0;
     let accumulatedDigitalScreenTimeMs = 0;
     let userHasLoggedInOnce = false;
-    let worldPopulationInterval; // Intervalo para o contador de população mundial
 
     // --- Funções de Utilitário de Data e Tempo ---
 
@@ -812,7 +777,7 @@
                 }
                 if (u > 0) {
                     if (s !== "" && (d !== 0 || c !== 0)) s += " e ";
-                    else if (s !== "" && d === 0 && c === 0 && n !== 0) s += " e "; // "e" para 101, 1001, etc.
+                    else if (s !== "" && d === 0 && c === 0 && n !== 0) s += " e ";
                     s += unidades[u];
                 }
             }
@@ -923,7 +888,7 @@
 
       const duration = formatMillisecondsToFullAge(tvtMs);
 
-      const theoreticalDeathDate = new Date(calmentBirthDate.getTime() + tvtMs); // Calcula a data teórica com base nos milissegundos
+      const theoreticalDeathDate = new Date(calmentDeathDate.getTime() + oneDayMs);
       const tvtAgeExact = getExactAge(calmentBirthDate, theoreticalDeathDate);
 
       tvtYearsSpan.textContent = pad(tvtAgeExact.years);
@@ -1008,17 +973,20 @@
         }
     }
 
-    // --- Funções para População Mundial e Ativo da Humanidade (na aba Visão Geral Global) ---
-    let worldPopulationLiveInterval;
-
-    function updateWorldPopulationLive() {
-        WORLD_POPULATION_LIVE_ESTIMATE += WORLD_POPULATION_INCREMENT_PER_MS * 10; // Incrementa a cada 10ms
-        worldPopulationDisplayGlobal.textContent = Math.floor(WORLD_POPULATION_LIVE_ESTIMATE).toLocaleString('pt-BR');
-        displayHumanityAssetGlobal(); // Recalcula o ativo da humanidade com a nova população
+    // --- Função para simular e exibir a população mundial em tempo real (para Visão Geral Global) ---
+    let worldPopulationIntervalGlobal;
+    function updateWorldPopulationDisplayGlobal() {
+        const now = Date.now();
+        const elapsedTime = (now - lastUpdateTimeGlobal) / 1000;
+        currentWorldPopulationGlobal += POPULATION_GROWTH_PER_SECOND * elapsedTime;
+        lastUpdateTimeGlobal = now;
+        worldPopulationDisplayGlobal.textContent = Math.floor(currentWorldPopulationGlobal).toLocaleString('pt-BR');
     }
 
+    // --- Função para calcular e exibir o "Maior Ativo da Humanidade" (para Visão Geral Global) ---
+    let humanityAssetIntervalGlobal;
     function displayHumanityAssetGlobal() {
-        const totalAssetDays = Math.floor(WORLD_POPULATION_LIVE_ESTIMATE) * JEANNE_CALMENT_LIFESPAN_DAYS;
+        const totalAssetDays = Math.floor(currentWorldPopulationGlobal) * JEANNE_CALMENT_LIFESPAN_DAYS;
         humanityAssetNumberGlobal.textContent = totalAssetDays.toLocaleString('pt-BR') + " dias";
         humanityAssetExtensoGlobal.textContent = numberToExtenso(totalAssetDays) + " dias";
     }
@@ -1032,36 +1000,28 @@
         .attr("viewBox", `0 0 ${width} ${height}`);
 
     const projection = d3.geoMercator()
-        .scale(120) // Ajuste a escala para o mapa caber
-        .center([0, 20]) // Centraliza o mapa (longitude, latitude)
+        .scale(120)
+        .center([0, 20])
         .translate([width / 2, height / 2]);
 
     const path = d3.geoPath().projection(projection);
 
-    // Dados de população de exemplo para alguns países (baseados em Worldometer 2024/2025)
-    // Usando códigos ISO 3166-1 alpha-3 para mapeamento com o TopoJSON
-    const countryPopulationsData = {
-        "CHN": { name: "China", population: 1425000000 },
-        "IND": { name: "Índia", population: 1428000000 },
-        "USA": { name: "Estados Unidos", population: 341000000 },
-        "IDN": { name: "Indonésia", population: 279000000 },
-        "PAK": { name: "Paquistão", population: 243000000 },
-        "NGA": { name: "Nigéria", population: 228000000 },
-        "BRA": { name: "Brasil", population: 216000000 },
-        "BGD": { name: "Bangladesh", population: 174000000 },
-        "RUS": { name: "Rússia", population: 144000000 },
-        "MEX": { name: "México", population: 129000000 },
-        "JPN": { name: "Japão", population: 123000000 },
-        "ETH": { name: "Etiópia", population: 127000000 },
-        "PHL": { name: "Filipinas", population: 119000000 },
-        "EGY": { name: "Egito", population: 114000000 },
-        "VNM": { name: "Vietnã", population: 99000000 },
-        "COD": { name: "RD Congo", population: 105000000 },
-        "IRN": { name: "Irã", population: 89000000 },
-        "TUR": { name: "Turquia", population: 86000000 },
-        "DEU": { name: "Alemanha", population: 83000000 },
-        "THA": { name: "Tailândia", population: 71000000 }
+    const countryPopulations = {
+        "BRA": "215.000.000", "USA": "335.000.000", "CHN": "1.425.000.000", "IND": "1.428.000.000",
+        "GBR": "67.000.000", "DEU": "83.000.000", "FRA": "65.000.000", "CAN": "40.000.000",
+        "AUS": "26.000.000", "RUS": "144.000.000", "JPN": "123.000.000", "ZAF": "60.000.000",
+        "ARG": "46.000.000", "MEX": "128.000.000", "ESP": "47.000.000", "ITA": "59.000.000",
+        "NGA": "220.000.000", "IDN": "278.000.000", "EGY": "109.000.000", "PAK": "240.000.000",
+        "BGD": "173.000.000", "NLD": "17.000.000", "BEL": "11.000.000", "SWE": "10.000.000",
+        "NOR": "5.500.000", "DNK": "5.900.000", "FIN": "5.500.000", "POL": "37.000.000",
+        "UKR": "37.000.000", "KOR": "51.000.000", "PRK": "26.000.000", "VNM": "99.000.000",
+        "THA": "71.000.000", "PHL": "117.000.000", "TUR": "85.000.000", "IRN": "89.000.000",
+        "SAU": "36.000.000", "COL": "52.000.000", "PER": "34.000.000", "CHL": "19.000.000",
+        "VEN": "28.000.000", "CUB": "11.000.000", "GRC": "10.000.000", "PRT": "10.000.000",
+        "CHE": "8.800.000", "AUT": "9.100.000", "IRL": "5.100.000", "NZL": "5.200.000",
+        "EGY": "109.000.000", "KEN": "55.000.000", "ETH": "126.000.000", "CAN": "40.000.000"
     };
+
 
     d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(world => {
         const countries = topojson.feature(world, world.objects.countries);
@@ -1073,9 +1033,8 @@
             .attr("d", path)
             .on("click", function(event, d) {
                 const countryName = d.properties.name;
-                const countryCode = d.id; 
-                const countryData = countryPopulationsData[countryCode];
-                const population = countryData ? countryData.population.toLocaleString('pt-BR') : "Dados não disponíveis";
+                const countryCode = d.id; // ISO A3 code for some datasets
+                const population = countryPopulations[countryCode] || "Dados não disponíveis";
                 
                 countryInfoBox.style.display = "block";
                 countryInfoBox.textContent = `${countryName}: Pop. ~${population}`;
@@ -1092,25 +1051,6 @@
         console.error("Erro ao carregar dados do mapa:", error);
         mapContainer.append("p").text("Erro ao carregar o mapa. Tente novamente mais tarde.");
     });
-
-    // --- Ranking dos Países Mais Populosos ---
-    function displayCountryRanking() {
-        // Converte o objeto de dados em um array, filtra por países com população, e ordena
-        const sortedCountries = Object.keys(countryPopulationsData)
-            .map(code => ({ code, ...countryPopulationsData[code] }))
-            .filter(country => country.population) // Garante que tem população
-            .sort((a, b) => b.population - a.population) // Ordena do maior para o menor
-            .slice(0, 10); // Pega os top 10
-
-        const listElement = document.getElementById("countryRankingList");
-        listElement.innerHTML = ''; // Limpa a lista existente
-
-        sortedCountries.forEach(country => {
-            const listItem = document.createElement("li");
-            listItem.innerHTML = `<span>${country.name}</span>: ${country.population.toLocaleString('pt-BR')}`;
-            listElement.appendChild(listItem);
-        });
-    }
 
 
     // --- Listener de Autenticação ---
@@ -1252,8 +1192,9 @@
         // Gerencia os intervalos dos relógios
         if (myLifeInterval) clearInterval(myLifeInterval);
         if (tvtInterval) clearInterval(tvtInterval);
-        if (worldPopulationLiveInterval) clearInterval(worldPopulationLiveInterval); // Limpa o intervalo da população mundial
         stopScreenTimeTracking(); // Para e salva o tempo de tela ao trocar de aba
+        if (worldPopulationIntervalGlobal) clearInterval(worldPopulationIntervalGlobal); // Limpa o intervalo global
+        if (humanityAssetIntervalGlobal) clearInterval(humanityAssetIntervalGlobal); // Limpa o intervalo do ativo
 
         if (targetTab === 'tvv') {
           updateMyLifeClock();
@@ -1265,15 +1206,11 @@
         } else if (targetTab === 'tvdt') {
             startScreenTimeTracking();
             displayTVDTData();
-        } else if (targetTab === 'global-overview') { // Lógica para a aba Visão Geral Global
-            updateTotalRegisteredUsersCount(); // Atualiza a contagem de usuários
-            // Inicia o contador de população mundial simulado
-            if (!worldPopulationLiveInterval) {
-                worldPopulationLiveInterval = setInterval(updateWorldPopulationLive, 10); // Atualiza a cada 10ms
-            }
-            displayHumanityAssetGlobal(); // Atualiza o ativo da humanidade
-            displayCountryRanking(); // Exibe o ranking dos países
-            // O mapa é renderizado uma vez no DOMContentLoaded, não precisa de atualização aqui
+        } else if (targetTab === 'global-overview') {
+            updateTotalRegisteredUsersCount();
+            // Inicia os intervalos para simular o "ao vivo" na aba global
+            worldPopulationIntervalGlobal = setInterval(updateWorldPopulationDisplayGlobal, 100);
+            humanityAssetIntervalGlobal = setInterval(displayHumanityAssetGlobal, 100);
         }
       });
     });
@@ -1294,7 +1231,6 @@
     // --- Salvar tempo de tela acumulado ao fechar/navegar na página ---
     window.addEventListener('beforeunload', () => {
         stopScreenTimeTracking();
-        if (worldPopulationLiveInterval) clearInterval(worldPopulationLiveInterval); // Limpa o intervalo da população mundial
     });
 
   </script>
