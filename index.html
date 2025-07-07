@@ -233,14 +233,14 @@
       getAuth, 
       signInWithPopup, 
       GoogleAuthProvider, 
-      createUserWithEmailAndPassword, // Novo
-      signInWithEmailAndPassword,     // Novo
-      signInAnonymously,              // Novo
-      RecaptchaVerifier,              // Novo
-      signInWithPhoneNumber,          // Novo
-      onAuthStateChanged 
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signInAnonymously,
+      RecaptchaVerifier,
+      signInWithPhoneNumber,
+      onAuthStateChanged // Mantido, mas usado de forma diferente
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getCountFromServer, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"; // Importado updateDoc
 
     // Sua configuração do Firebase (Garanta que esta é a COPIA EXATA do seu Console do Firebase)
     const firebaseConfig = {
@@ -257,6 +257,12 @@
     const db = getFirestore(app);
 
     let confirmationResult; // Para login com telefone
+
+    // --- VERIFICAÇÃO INICIAL DE AUTENTICAÇÃO AO CARREGAR A PÁGINA ---
+    // Se o usuário JÁ ESTIVER logado de uma sessão anterior, redireciona IMEDIATAMENTE.
+    if (auth.currentUser) {
+      window.location.href = "./perfil.html";
+    }
 
     document.addEventListener("DOMContentLoaded", () => {
       // DOM Elements
@@ -330,8 +336,7 @@
           statusText.innerText = "Registrando com e-mail...";
           const result = await createUserWithEmailAndPassword(auth, email, password);
           const user = result.user;
-          // O displayName pode ser definido depois no perfil, ou durante o registro se quiser pedir nome aqui
-          await createUserDocumentIfNew(user, email); // Passa o email para o nome inicial se não tiver displayName
+          await createUserDocumentIfNew(user, email);
           window.location.href = "./perfil.html";
         } catch (error) {
           console.error("Erro no registro com E-mail:", error);
@@ -345,7 +350,7 @@
           statusText.innerText = "Entrando como anônimo...";
           const result = await signInAnonymously(auth);
           const user = result.user;
-          await createUserDocumentIfNew(user, "Usuário Anônimo"); // Nome padrão
+          await createUserDocumentIfNew(user, "Usuário Anônimo");
           window.location.href = "./perfil.html";
         } catch (error) {
           console.error("Erro no login Anônimo:", error);
@@ -357,20 +362,18 @@
       // Inicializa o reCAPTCHA Verifier
       // A variável window.recaptchaVerifier é importante para o Firebase Auth.
       window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'normal', // ou 'invisible' se quiser esconder, mas 'normal' é bom para testes
+        'size': 'normal',
         'callback': (response) => {
-          // reCAPTCHA resolvido, você pode habilitar o botão de enviar código
           sendSmsCodeBtn.disabled = false;
         },
         'expired-callback': () => {
-          // reCAPTCHA expirou, resetar ou mostrar mensagem
           sendSmsCodeBtn.disabled = true;
           statusText.innerText = "ReCAPTCHA expirou, por favor, tente novamente.";
         }
       });
       // Renderiza o reCAPTCHA na página
       recaptchaVerifier.render().then((widgetId) => {
-        window.recaptchaWidgetId = widgetId; // Guarda o ID do widget se precisar resetar
+        window.recaptchaWidgetId = widgetId;
       });
       
       sendSmsCodeBtn.addEventListener("click", async () => {
@@ -384,13 +387,12 @@
 
         try {
           confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
-          verifyCodeSection.style.display = 'block'; // Mostra a seção de inserção do código
+          verifyCodeSection.style.display = 'block';
           statusText.innerText = "Código SMS enviado. Verifique seu telefone.";
         } catch (error) {
           console.error("Erro ao enviar código SMS:", error);
           statusText.innerText = `Erro ao enviar código: ${error.message}`;
-          sendSmsCodeBtn.disabled = false; // Re-habilita o botão em caso de erro
-          // Tente resetar o reCAPTCHA se o erro for relacionado a ele
+          sendSmsCodeBtn.disabled = false;
           if (window.recaptchaVerifier && window.recaptchaWidgetId) {
             window.recaptchaVerifier.reset(window.recaptchaWidgetId);
           }
@@ -409,7 +411,7 @@
         try {
           const result = await confirmationResult.confirm(code);
           const user = result.user;
-          await createUserDocumentIfNew(user, user.phoneNumber); // Usa o número como nome inicial
+          await createUserDocumentIfNew(user, user.phoneNumber);
           window.location.href = "./perfil.html";
         } catch (error) {
           console.error("Erro ao verificar código SMS:", error);
@@ -423,20 +425,17 @@
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
         if (!userSnap.exists()) {
-          // Define o nome: usa displayName do Firebase Auth, ou um padrão
           let nameToSet = user.displayName || defaultName || user.email || user.phoneNumber || `Usuário ${user.uid.substring(0, 8)}`;
           
           await setDoc(userRef, {
             uid: user.uid,
             name: nameToSet,
-            email: user.email || null, // Pode ser null para login anônimo/telefone
-            phoneNumber: user.phoneNumber || null, // Pode ser null para outros logins
+            email: user.email || null,
+            phoneNumber: user.phoneNumber || null,
             createdAt: new Date(),
             lastLoginAt: new Date()
-            // dateOfBirth e placeOfBirth serão adicionados no perfil.html
-          }, { merge: true }); // Usar merge para não sobrescrever se o documento já existir com campos parciais
+          }, { merge: true });
         } else {
-          // Se o usuário já existe, apenas atualiza o lastLoginAt
           await updateDoc(userRef, {
             lastLoginAt: new Date()
           });
@@ -455,16 +454,8 @@
         }
       }
 
-      // --- Listener de Autenticação para redirecionar ou atualizar contador ---
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          // Se o usuário já estiver logado, redireciona para o perfil
-          window.location.href = "./perfil.html";
-        } else {
-          // Se não estiver logado, atualiza o contador de usuários
-          updateUserCount();
-        }
-      });
+      // Atualiza o contador de usuários quando o DOM estiver pronto
+      updateUserCount();
     });
   </script>
 </body>
