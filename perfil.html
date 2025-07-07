@@ -3,324 +3,188 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Perfil ID1 | Carteira e Ampulheta Digital</title>
+  <title>Perfil ID1</title>
   <style>
-    /* Reset básico e estilos gerais */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      background: #eef1f6;
+      text-align: center;
+      background: #eef2f6; /* Fundo mais suave */
       color: #333;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+    }
+    header {
+      background: #2c3e50; /* Cor escura do cabeçalho */
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .container {
-      max-width: 960px;
-      width: 100%;
-      padding: 20px;
-      box-sizing: border-box;
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
     }
-    h1, h2, h3 {
-      color: #2c3e50;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .card {
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      margin-bottom: 25px;
-    }
-    .grid-2-cols {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-    }
-    @media (min-width: 768px) {
-      .grid-2-cols {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    .button {
-      background: #4a90e2;
+    header button {
+      background: #e74c3c; /* Vermelho para sair */
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 0.6rem 1.2rem;
       border-radius: 5px;
       cursor: pointer;
       font-size: 1rem;
       transition: background-color 0.3s ease;
-      display: inline-block;
-      margin-top: 10px;
-      margin-right: 5px; /* Para botões lado a lado */
     }
-    .button:hover {
-      background-color: #357bd8;
-    }
-    .button:disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
-    }
-    .danger-button {
-      background: #e74c3c;
-    }
-    .danger-button:hover {
+    header button:hover {
       background-color: #c0392b;
     }
-    .secondary-button {
-        background: #6c757d;
+    main {
+      flex-grow: 1;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
-    .secondary-button:hover {
-        background: #5a6268;
+    .profile-card {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      margin: 20px auto;
+      text-align: left;
     }
-    input[type="date"],
-    input[type="number"],
-    input[type="file"],
-    input[type="text"],
-    select {
-      width: calc(100% - 22px);
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
+    .profile-card h2 {
+      color: #34495e;
+      margin-bottom: 25px;
+      text-align: center;
+      font-size: 2rem;
+    }
+    .form-group {
+      margin-bottom: 20px;
     }
     label {
       display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-      color: #555;
-      text-align: left;
-    }
-    .document-list ul {
-      list-style: none;
-      padding: 0;
-    }
-    .document-list li {
-      background: #f9f9f9;
-      border: 1px solid #eee;
-      padding: 10px;
       margin-bottom: 8px;
-      border-radius: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .document-list li a {
-      color: #4a90e2;
-      text-decoration: none;
-      word-break: break-all;
-    }
-    .document-list li a:hover {
-      text-decoration: underline;
-    }
-    .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border-left-color: #4a90e2;
-      animation: spin 1s ease infinite;
-      display: inline-block;
-      vertical-align: middle;
-      margin-left: 10px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    #loadingMessage, #errorMessage {
-      text-align: center;
-      padding: 20px;
-      font-size: 1.1rem;
+      font-weight: bold;
       color: #555;
+      font-size: 1.05rem;
     }
-    #errorMessage {
-      color: #e74c3c;
+    input[type="text"],
+    input[type="email"],
+    input[type="date"] {
+      width: calc(100% - 22px);
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
+    input[type="email"][readonly] {
+      background-color: #f0f0f0; /* Fundo cinza para campos somente leitura */
+      cursor: not-allowed;
+    }
+    .button-save {
+      background: #28a745; /* Verde para salvar */
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      width: auto;
+      margin-top: 20px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .button-save:hover {
+      background-color: #218838;
+      transform: translateY(-2px);
+    }
+    .status-message {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: #e74c3c; /* Vermelho para erros */
+      text-align: center;
       font-weight: bold;
     }
-    #profileContent {
-      display: none; /* Esconde até o usuário ser carregado */
+    .success-message {
+        color: #27ae60; /* Verde para sucesso */
     }
-    .modal {
-      display: none; /* Hidden by default */
-      position: fixed; /* Stay in place */
-      z-index: 1000; /* Sit on top */
-      left: 0;
-      top: 0;
-      width: 100%; /* Full width */
-      height: 100%; /* Full height */
-      overflow: auto; /* Enable scroll if needed */
-      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-      justify-content: center;
-      align-items: center;
+    footer {
+      background: #2c3e50;
+      color: white;
+      padding: 1rem;
+      margin-top: auto;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
     }
-    .modal-content {
-      background-color: #fefefe;
-      margin: auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%; /* Could be more responsive */
-      max-width: 500px;
-      border-radius: 8px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      text-align: center;
-    }
-    .modal-content h3 {
-        margin-top: 0;
-    }
-    .modal-content input {
-        margin-bottom: 15px;
-    }
-    .stat-item {
-        background: #f8fbfd;
-        padding: 15px;
-        border-radius: 5px;
-        border: 1px solid #e0e6ed;
-        margin-bottom: 10px;
-    }
-    .stat-item strong {
-        display: block;
-        font-size: 1.2em;
-        color: #2c3e50;
-        margin-bottom: 5px;
-    }
-    .stat-item span {
-        font-size: 0.9em;
-        color: #7f8c8d;
-    }
-    #documentTypeSelect {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-    /* Estilos para o modo de edição de perfil */
-    .profile-display-mode { display: block; }
-    .profile-edit-mode { display: none; }
-    .profile-display-mode p, .profile-display-mode button { margin-bottom: 10px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="header-title">🌟 Perfil ID1 | Sua Identidade Digital</h1>
+  <header>
+    <h1>🌟 Perfil ID1</h1>
+    <button id="logoutButton">Sair</button>
+  </header>
 
-    <p id="loadingMessage">Carregando dados do perfil... <span class="spinner"></span></p>
-    <p id="errorMessage" style="display: none;"></p>
+  <main>
+    <div class="profile-card">
+      <h2>Meus Dados</h2>
+      <p id="status" class="status-message"></p>
 
-    <div id="profileContent">
-      <div class="grid-2-cols">
-        <div class="card">
-          <h2>Dados do Perfil</h2>
-
-          <div id="profileDisplayMode" class="profile-display-mode">
-            <p><strong>Nome:</strong> <span id="userName"></span></p>
-            <p><strong>E-mail:</strong> <span id="userEmail"></span></p>
-            <p><strong>Método de Login:</strong> <span id="userLoginMethod"></span></p>
-            <p><strong>Membro desde:</strong> <span id="memberSince"></span></p>
-            <p><strong>Data de Nascimento:</strong> <span id="userDobDisplay"></span></p>
-            <p><strong>Local de Nascimento:</strong> <span id="userPobDisplay"></span></p>
-            <button id="editProfileBtn" class="button">Editar Perfil</button>
-            <button id="logoutBtn" class="button danger-button">Sair</button>
-          </div>
-
-          <div id="profileEditMode" class="profile-edit-mode">
-            <label for="editNameInput">Nome:</label>
-            <input type="text" id="editNameInput" placeholder="Seu nome completo">
-
-            <label for="editDobInput">Data de Nascimento:</label>
-            <input type="date" id="editDobInput">
-
-            <label for="editPobInput">Local de Nascimento:</label>
-            <input type="text" id="editPobInput" placeholder="Cidade, País">
-
-            <button id="saveProfileBtn" class="button">Salvar Alterações</button>
-            <button id="cancelEditBtn" class="button secondary-button">Cancelar</button>
-            <p id="editProfileStatus" style="font-size: 0.9em; color: #7f8c8d; margin-top: 5px;"></p>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>Ampulheta Digital</h2>
-          <div class="stat-item">
-            <strong><span id="daysLivedDisplay">0</span> dias</strong>
-            <span>Você já viveu</span>
-          </div>
-          <div class="stat-item">
-            <strong>TVT Atribuído: <span id="tvtTotalAttributedDisplay">0</span> dias</strong>
-            <span>Tempo de Vida Total (Base + Vivido + Bônus)</span>
-          </div>
-          <div class="stat-item">
-            <strong>TVDT Bruto: <span id="tvdtRawScreenTimeDisplay">0</span> horas</strong>
-            <span>Tempo de Vida Dedicado a Telas (horas)</span>
-          </div>
-          <div class="stat-item">
-            <strong>TVDT Token: <span id="tvdtTokenValueDisplay">0</span></strong>
-            <span>(Tempo de Tela x 2)</span>
-          </div>
-
-          <h3>Registrar Tempo de Tela</h3>
-          <label for="screenTimeInput">Horas Diárias nas Telas:</label>
-          <input type="number" id="screenTimeInput" min="0" max="24" step="0.1" placeholder="Ex: 5.5">
-          <button id="recordScreenTimeBtn" class="button">Registrar Tempo</button>
-          <p id="screenTimeStatus" style="font-size: 0.9em; color: #7f8c8d; margin-top: 5px;"></p>
-        </div>
+      <div class="form-group">
+        <label for="nameInput">Nome Completo:</label>
+        <input type="text" id="nameInput" placeholder="Seu Nome">
       </div>
 
-      <div class="grid-2-cols">
-        <div class="card">
-          <h2>Carteira de Documentos</h2>
-          <p style="text-align: center; color: #666; margin: 20px 0;">
-            A funcionalidade de Carteira de Documentos está em desenvolvimento.<br>
-            Em breve você poderá armazenar seus documentos aqui de forma segura!
-          </p>
-        </div>
-
-
-        <div class="card">
-          <h2>Provas e Renda Universal</h2>
-          <p>Realize as provas para acessar a Renda Universal.</p>
-          <p>Seu "mais valor" é adicionado a cada Prova de Vida.</p>
-
-          <h3>Prova de Vida</h3>
-          <button id="proofOfLifeBtn" class="button">Realizar Prova de Vida</button>
-          <p id="proofOfLifeStatus" style="font-size: 0.9em; color: #7f8c8d; margin-top: 5px;"></p>
-          
-          </div>
+      <div class="form-group">
+        <label for="emailInput">E-mail:</label>
+        <input type="email" id="emailInput" readonly>
+        <small style="color: #666; display: block; margin-top: 5px;">Este campo não pode ser alterado aqui.</small>
       </div>
-    </div>
-  </div>
 
-  <div id="dobModal" class="modal">
-    <div class="modal-content">
-      <h3>Por favor, insira sua data de nascimento</h3>
-      <p>Precisamos desta informação para calcular seu Tempo de Vida Total (TVT).</p>
-      <label for="dobInput">Data de Nascimento:</label>
-      <input type="date" id="dobInput">
-      <button id="saveDobBtn" class="button">Salvar Data de Nascimento</button>
-      <p id="dobStatus" style="font-size: 0.9em; color: #e74c3c; margin-top: 5px;"></p>
+      <div class="form-group">
+        <label for="dateOfBirthInput">Data de Nascimento:</label>
+        <input type="date" id="dateOfBirthInput">
+      </div>
+
+      <div class="form-group">
+        <label for="placeOfBirthInput">Local de Nascimento:</label>
+        <input type="text" id="placeOfBirthInput" placeholder="Cidade, País">
+      </div>
+
+      <button id="saveProfileButton" class="button-save">Salvar Perfil</button>
     </div>
-  </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Evoluzion. Todos os direitos reservados.</p>
+  </footer>
 
   <script type="module">
-    // Importações do Firebase SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    // O import do Storage foi removido/comentado aqui para evitar o problema de upgrade
-    // import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+    import { 
+      getAuth, 
+      signOut, 
+      onAuthStateChanged // Para verificar o estado da autenticação
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      updateDoc 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // Sua configuração do Firebase (Mesma do index.html)
-    // GARANTA QUE ESTA firebaseConfig SEJA EXATAMENTE A QUE VOCÊ PEGOU DO SEU CONSOLE DO FIREBASE
-    // EM PRODUÇÃO, USE VARIÁVEIS DE AMBIENTE PARA A CHAVE API E OUTROS DADOS SENSÍVEIS!
     const firebaseConfig = {
-      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
+      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk", // Use sua chave real
       authDomain: "evoluzion-id1.firebaseapp.com",
       projectId: "evoluzion-id1",
       storageBucket: "evoluzion-id1.appspot.com",
@@ -328,408 +192,120 @@
       appId: "1:413091065593:web:3527d66e02a2bf2f767c28"
     };
 
-    // Inicializa o Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    // O Storage não é inicializado aqui para evitar o pedido de upgrade
-    // const storage = getStorage(app);
 
-    // --- Constantes Globais ---
-    const TVT_BASE_DAYS = 44724; // Jeanne Calment: 122 anos e 164 dias
-    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    // DOM Elements
+    const statusText = document.getElementById("status");
+    const nameInput = document.getElementById("nameInput");
+    const emailInput = document.getElementById("emailInput");
+    const dateOfBirthInput = document.getElementById("dateOfBirthInput");
+    const placeOfBirthInput = document.getElementById("placeOfBirthInput");
+    const saveProfileButton = document.getElementById("saveProfileButton");
+    const logoutButton = document.getElementById("logoutButton");
 
-    // --- Elementos DOM ---
-    // Display Mode
-    const userNameElem = document.getElementById("userName");
-    const userEmailElem = document.getElementById("userEmail");
-    const userLoginMethodElem = document.getElementById("userLoginMethod");
-    const memberSinceElem = document.getElementById("memberSince");
-    const userDobDisplay = document.getElementById("userDobDisplay");
-    const userPobDisplay = document.getElementById("userPobDisplay");
-    const editProfileBtn = document.getElementById("editProfileBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    // Edit Mode
-    const profileDisplayMode = document.getElementById("profileDisplayMode");
-    const profileEditMode = document.getElementById("profileEditMode");
-    const editNameInput = document.getElementById("editNameInput");
-    const editDobInput = document.getElementById("editDobInput");
-    const editPobInput = document.getElementById("editPobInput");
-    const saveProfileBtn = document.getElementById("saveProfileBtn");
-    const cancelEditBtn = document.getElementById("cancelEditBtn");
-    const editProfileStatus = document.getElementById("editProfileStatus");
-
-    const loadingMessage = document.getElementById("loadingMessage");
-    const errorMessage = document.getElementById("errorMessage");
-    const profileContent = document.getElementById("profileContent");
-
-    // Ampulheta Digital
-    const daysLivedDisplay = document.getElementById("daysLivedDisplay");
-    const tvtTotalAttributedDisplay = document.getElementById("tvtTotalAttributedDisplay");
-    const tvdtRawScreenTimeDisplay = document.getElementById("tvdtRawScreenTimeDisplay");
-    const tvdtTokenValueDisplay = document.getElementById("tvdtTokenValueDisplay");
-    const screenTimeInput = document.getElementById("screenTimeInput");
-    const recordScreenTimeBtn = document.getElementById("recordScreenTimeBtn");
-    const screenTimeStatus = document.getElementById("screenTimeStatus");
-
-    // Carteira de Documentos (variáveis comentadas para desabilitar funcionalidade)
-    // const documentTypeSelect = document.getElementById("documentTypeSelect");
-    // const documentUploadInput = document.getElementById("documentUploadInput");
-    // const uploadDocumentBtn = document.getElementById("uploadDocumentBtn");
-    // const uploadStatus = document.getElementById("uploadStatus");
-    // const uploadedDocumentsList = document.getElementById("uploadedDocumentsList");
-
-    // Provas
-    const proofOfLifeBtn = document.getElementById("proofOfLifeBtn");
-    const proofOfLifeStatus = document.getElementById("proofOfLifeStatus");
-
-    // Modal Data de Nascimento (ainda existe para o primeiro preenchimento obrigatório)
-    const dobModal = document.getElementById("dobModal");
-    const dobInput = document.getElementById("dobInput");
-    const saveDobBtn = document.getElementById("saveDobBtn");
-    const dobStatus = document.getElementById("dobStatus");
-
-    let currentUserData = null; // Variável para armazenar os dados do usuário logado do Firestore
-
-    // --- Funções de Utilidade ---
-
-    // Exibir mensagem de erro na página principal
-    function showPageErrorMessage(message) {
-      loadingMessage.style.display = 'none';
-      profileContent.style.display = 'none';
-      errorMessage.innerText = message;
-      errorMessage.style.display = 'block';
-    }
-
-    // Calcular dias vividos
-    function calculateDaysLived(dateOfBirth) {
-        if (!dateOfBirth) return 0;
-        const birthDate = dateOfBirth instanceof Date ? dateOfBirth : new Date(dateOfBirth);
-        const today = new Date();
-        const diffTime = Math.abs(today.getTime() - birthDate.getTime());
-        return Math.ceil(diffTime / MS_PER_DAY);
-    }
-
-    // Formatar segundos em HH:MM:SS
-    function formatSeconds(totalSeconds) {
-        if (totalSeconds < 0) totalSeconds = 0;
-        const hours = Math.floor(totalSeconds / 3600);
-        totalSeconds %= 3600;
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = Math.floor(totalSeconds % 60);
-        return `${hours}h ${minutes}m ${seconds}s`;
-    }
-
-    // Obter o método de login
-    function getLoginMethod(user) {
-        if (user.isAnonymous) return "Anônimo";
-        if (user.providerData && user.providerData.length > 0) {
-            const providerIds = user.providerData.map(p => p.providerId);
-            if (providerIds.includes("google.com")) return "Google";
-            if (providerIds.includes("password")) return "E-mail/Senha";
-            if (providerIds.includes("phone")) return "Smartphone";
-        }
-        return "Desconhecido";
-    }
-
-    // --- Funções de Interação com Firebase ---
-
-    // Função para buscar e exibir dados do perfil e ampulheta digital
-    async function loadUserProfile(user) {
-        const userDocRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userDocRef);
-
-        if (userSnap.exists()) {
-            const userData = userSnap.data();
-            currentUserData = userData; // Salva os dados do usuário globalmente
-
-            // Exibe dados no modo de visualização
-            userNameElem.innerText = userData.name || user.displayName || "Não informado";
-            userEmailElem.innerText = userData.email || user.email || "Não informado";
-            userLoginMethodElem.innerText = getLoginMethod(user);
-            memberSinceElem.innerText = userData.createdAt ? new Date(userData.createdAt.toDate()).toLocaleDateString() : "N/A";
-            userDobDisplay.innerText = userData.dateOfBirth ? new Date(userData.dateOfBirth.toDate()).toLocaleDateString() : "Não informado";
-            userPobDisplay.innerText = userData.placeOfBirth || "Não informado";
-
-            // Preenche inputs para o modo de edição
-            editNameInput.value = userData.name || user.displayName || "";
-            editDobInput.value = userData.dateOfBirth ? new Date(userData.dateOfBirth.toDate()).toISOString().split('T')[0] : "";
-            editPobInput.value = userData.placeOfBirth || "";
-
-            // --- Gerenciamento da Data de Nascimento no primeiro login/preenchimento ---
-            if (!userData.dateOfBirth) {
-                dobModal.style.display = 'flex'; // Exibe o modal para preencher a DOB
-            } else {
-                dobModal.style.display = 'none'; // Esconde o modal se já tiver
-                updateDigitalHourglassDisplay(userData);
-            }
-            
-            // loadUserDocuments(user.uid); // CHAMADA REMOVIDA/COMENTADA PARA DESABILITAR STORAGE
-            
-        } else {
-            // Esta é a mensagem que você viu na imagem
-            showPageErrorMessage("Dados do usuário não encontrados. Por favor, tente novamente ou entre em contato com o suporte.");
-        }
-    }
-
-    // Função para atualizar a exibição da ampulheta digital
-    function updateDigitalHourglassDisplay(userData) {
-        const daysLived = userData.dateOfBirth ? calculateDaysLived(userData.dateOfBirth) : 0;
-        const tvtBonusDays = userData.tvt_bonus_days || 0;
-        const tvtTotalAttributed = TVT_BASE_DAYS + daysLived + tvtBonusDays;
-
-        daysLivedDisplay.innerText = daysLived;
-        tvtTotalAttributedDisplay.innerText = tvtTotalAttributed;
-        
-        // TVDT
-        const tvdtRawScreenTimeSeconds = userData.tvdt_screen_time_seconds || 0;
-        const tvdtTokenValueSeconds = tvdtRawScreenTimeSeconds * 2;
-
-        tvdtRawScreenTimeDisplay.innerText = formatSeconds(tvdtRawScreenTimeSeconds);
-        tvdtTokenValueDisplay.innerText = formatSeconds(tvdtTokenValueSeconds);
-    }
-
-    // --- Edição de Perfil ---
-    editProfileBtn.addEventListener("click", () => {
-        profileDisplayMode.style.display = 'none';
-        profileEditMode.style.display = 'block';
-        editProfileStatus.innerText = ""; // Limpa status anterior
-    });
-
-    cancelEditBtn.addEventListener("click", () => {
-        profileDisplayMode.style.display = 'block';
-        profileEditMode.style.display = 'none';
-    });
-
-    saveProfileBtn.addEventListener("click", async () => {
-        if (!currentUserData || !auth.currentUser) {
-            editProfileStatus.innerText = "Erro: Usuário não logado.";
-            return;
-        }
-
-        const newName = editNameInput.value.trim();
-        const newDob = editDobInput.value;
-        const newPob = editPobInput.value.trim();
-
-        editProfileBtn.disabled = true; // Desabilita botões durante o salvamento
-        saveProfileBtn.disabled = true;
-        cancelEditBtn.disabled = true;
-        editProfileStatus.innerText = "Salvando...";
-
-        try {
-            const userAuth = auth.currentUser;
-            const userDocRef = doc(db, "users", userAuth.uid);
-
-            const updates = {};
-            let authProfileUpdateNeeded = false;
-
-            // Atualiza nome no Firebase Auth (se mudou)
-            if (newName !== (userAuth.displayName || currentUserData.name)) {
-                await updateProfile(userAuth, { displayName: newName });
-                updates.name = newName; // Também salva no Firestore
-                authProfileUpdateNeeded = true;
-            } else {
-                updates.name = currentUserData.name; // Garante que o nome atual seja salvo no Firestore
-            }
-
-
-            // Atualiza Data de Nascimento no Firestore
-            if (newDob) {
-                updates.dateOfBirth = new Date(newDob);
-            } else {
-                 if (currentUserData.dateOfBirth) updates.dateOfBirth = currentUserData.dateOfBirth; // Mantém o anterior se vazio
-            }
-
-            // Atualiza Local de Nascimento no Firestore
-            if (newPob) {
-                updates.placeOfBirth = newPob;
-            } else {
-                if (currentUserData.placeOfBirth) updates.placeOfBirth = currentUserData.placeOfBirth; // Mantém o anterior se vazio
-            }
-            
-            await updateDoc(userDocRef, updates);
-            
-            // Atualiza currentUserData localmente com as novas informações para refletir imediatamente
-            currentUserData = { ...currentUserData, ...updates };
-
-            editProfileStatus.innerText = "Perfil atualizado com sucesso!";
-            
-            // Atualiza a exibição no modo de visualização
-            userNameElem.innerText = currentUserData.name || userAuth.displayName || "Não informado";
-            userDobDisplay.innerText = currentUserData.dateOfBirth ? new Date(currentUserData.dateOfBirth.toDate()).toLocaleDateString() : "Não informado";
-            userPobDisplay.innerText = currentUserData.placeOfBirth || "Não informado";
-            
-            // Se o nome foi atualizado no Auth, o displayName do objeto userAuth já estará atualizado
-            if (authProfileUpdateNeeded) {
-                userAuth.reload(); // Recarrega o objeto userAuth para garantir que displayname esteja atualizado
-            }
-
-
-            // Volta para o modo de visualização
-            setTimeout(() => {
-                profileDisplayMode.style.display = 'block';
-                profileEditMode.style.display = 'none';
-                editProfileStatus.innerText = "";
-            }, 1500); // Dá um tempo para o usuário ver a mensagem de sucesso
-
-        } catch (error) {
-            console.error("Erro ao salvar perfil:", error);
-            editProfileStatus.innerText = `Erro ao salvar perfil: ${error.message}`;
-        } finally {
-            editProfileBtn.disabled = false;
-            saveProfileBtn.disabled = false;
-            cancelEditBtn.disabled = false;
-        }
-    });
-
-
-    // Função para salvar a data de nascimento (do modal de primeiro preenchimento)
-    saveDobBtn.addEventListener("click", async () => {
-        const dob = dobInput.value;
-        if (!dob) {
-            dobStatus.innerText = "Por favor, selecione uma data.";
-            return;
-        }
-        if (!currentUserData || !currentUserData.uid) {
-            dobStatus.innerText = "Erro: Usuário não identificado. Recarregue a página.";
-            return;
-        }
-
-        try {
-            await updateDoc(doc(db, "users", currentUserData.uid), {
-                dateOfBirth: new Date(dob) // Salva como timestamp do Firebase
-            });
-            currentUserData.dateOfBirth = new Date(dob); // Atualiza o objeto local
-            updateDigitalHourglassDisplay(currentUserData);
-            userDobDisplay.innerText = new Date(currentUserData.dateOfBirth.toDate()).toLocaleDateString(); // Atualiza a exibição
-            dobModal.style.display = 'none';
-            dobStatus.innerText = "";
-        } catch (error) {
-            console.error("Erro ao salvar data de nascimento:", error);
-            dobStatus.innerText = "Erro ao salvar data. Tente novamente.";
-        }
-    });
-
-    // Função para registrar tempo de tela
-    recordScreenTimeBtn.addEventListener("click", async () => {
-        if (!currentUserData || !currentUserData.uid) {
-            screenTimeStatus.innerText = "Erro: Usuário não logado.";
-            return;
-        }
-
-        const screenTimeHours = parseFloat(screenTimeInput.value);
-        if (isNaN(screenTimeHours) || screenTimeHours < 0 || screenTimeHours > 24) {
-            screenTimeStatus.innerText = "Por favor, insira um número válido de horas (0-24).";
-            return;
-        }
-        const screenTimeSeconds = screenTimeHours * 3600; // Converte horas para segundos
-
-        recordScreenTimeBtn.disabled = true;
-        screenTimeStatus.innerText = "Registrando...";
-
-        try {
-            const userDocRef = doc(db, "users", currentUserData.uid);
-            // Incrementa o tempo de tela existente
-            const currentScreenTimeSeconds = currentUserData.tvdt_screen_time_seconds || 0;
-            const newScreenTimeSeconds = currentScreenTimeSeconds + screenTimeSeconds;
-
-            await updateDoc(userDocRef, {
-                tvdt_screen_time_seconds: newScreenTimeSeconds,
-                last_tvdt_update: new Date()
-            });
-
-            currentUserData.tvdt_screen_time_seconds = newScreenTimeSeconds; // Atualiza localmente
-            updateDigitalHourglassDisplay(currentUserData); // Atualiza a exibição
-
-            screenTimeStatus.innerText = "Tempo registrado com sucesso!";
-            screenTimeInput.value = ""; // Limpa o input
-        } catch (error) {
-            console.error("Erro ao registrar tempo de tela:", error);
-            screenTimeStatus.innerText = "Erro ao registrar tempo. Tente novamente.";
-        } finally {
-            recordScreenTimeBtn.disabled = false;
-        }
-    });
-
-    // As funções de upload e carregamento de documentos estão comentadas para desabilitar o Storage
-    /*
-    uploadDocumentBtn.addEventListener("click", async () => {
-        // Código de upload de documentos aqui
-    });
-
-    async function loadUserDocuments(uid) {
-        // Código de carregamento de documentos aqui
-    }
-    */
-
-    // Função para Realizar Prova de Vida
-    proofOfLifeBtn.addEventListener("click", async () => {
-        if (!currentUserData || !currentUserData.uid) {
-            proofOfLifeStatus.innerText = "Erro: Usuário não logado.";
-            return;
-        }
-
-        proofOfLifeBtn.disabled = true;
-        proofOfLifeStatus.innerText = "Realizando prova de vida...";
-
-        try {
-            const userDocRef = doc(db, "users", currentUserData.uid);
-            // Incrementa tvt_bonus_days em 1
-            const currentBonusDays = currentUserData.tvt_bonus_days || 0;
-            const newBonusDays = currentBonusDays + 1;
-
-            await updateDoc(userDocRef, {
-                tvt_bonus_days: newBonusDays
-            });
-            currentUserData.tvt_bonus_days = newBonusDays; // Atualiza o objeto local
-
-            // Registra o log da prova
-            const proofsLogsCollectionRef = collection(db, "users", currentUserData.uid, "proofs_logs");
-            await setDoc(doc(proofsLogsCollectionRef), {
-                type: "proof_of_life",
-                timestamp: new Date(),
-                details: { days_added: 1, method: "manual_click" }, // Pode ser expandido com métodos de verificação reais
-                tvt_snapshot_at_event: TVT_BASE_DAYS + calculateDaysLived(currentUserData.dateOfBirth) + newBonusDays
-            });
-
-            updateDigitalHourglassDisplay(currentUserData); // Atualiza a exibição
-            proofOfLifeStatus.innerText = "Prova de vida realizada! +1 dia de valor atribuído!";
-        } catch (error) {
-            console.error("Erro ao realizar prova de vida:", error);
-            proofOfLifeStatus.innerText = "Erro ao realizar prova de vida. Tente novamente.";
-        } finally {
-            proofOfLifeBtn.disabled = false;
-        }
-    });
-
-    // --- Listener de Autenticação Global ---
+    // --- Listener de Autenticação ---
+    // Verifica se o usuário está logado. Se não estiver, redireciona para a página inicial.
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Usuário logado
-        console.log("Usuário logado:", user.displayName, user.uid);
-        loadingMessage.style.display = 'none';
-        errorMessage.style.display = 'none';
-        profileContent.style.display = 'block'; // Mostra o conteúdo do perfil
-        await loadUserProfile(user); // Carrega os dados do perfil
+        // Usuário logado: Carrega os dados do perfil
+        emailInput.value = user.email || "Não disponível"; // Define o e-mail (apenas leitura)
+        await loadUserProfile(user.uid);
       } else {
-        // Usuário não logado, redirecionar
-        alert("Você precisa estar logado para acessar esta página. Redirecionando...");
+        // Usuário não logado: Redireciona para a página de login
         window.location.href = "./index.html";
       }
     });
 
-    // --- Logout ---
-    logoutBtn.addEventListener("click", async () => {
+    // --- Carregar Dados do Perfil ---
+    async function loadUserProfile(uid) {
+      statusText.className = "status-message"; // Reset class
+      statusText.innerText = "Carregando perfil...";
+      try {
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          const currentUserData = userSnap.data();
+          nameInput.value = currentUserData.name || "";
+          placeOfBirthInput.value = currentUserData.placeOfBirth || "";
+
+          // --- Tratamento da Data de Nascimento (importante para evitar o erro) ---
+          if (currentUserData.dateOfBirth && typeof currentUserData.dateOfBirth.toDate === 'function') {
+            const date = currentUserData.dateOfBirth.toDate();
+            // Formata a data para YYYY-MM-DD para o input type="date"
+            dateOfBirthInput.value = date.toISOString().split('T')[0];
+          } else {
+            dateOfBirthInput.value = ""; // Limpa se não houver data válida ou for de tipo errado
+          }
+          statusText.innerText = ""; // Limpa a mensagem de carregamento
+        } else {
+          statusText.innerText = "Documento de perfil não encontrado. Crie um novo.";
+          // Se o documento não existe, os campos permanecem vazios para preenchimento
+        }
+      } catch (error) {
+        console.error("Erro ao carregar perfil:", error);
+        statusText.innerText = `Erro ao carregar perfil: ${error.message}`;
+      }
+    }
+
+    // --- Salvar Dados do Perfil ---
+    saveProfileButton.addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        statusText.innerText = "Nenhum usuário logado para salvar.";
+        return;
+      }
+
+      statusText.className = "status-message"; // Reset class
+      statusText.innerText = "Salvando perfil...";
+      
+      const updatedName = nameInput.value.trim();
+      const updatedPlaceOfBirth = placeOfBirthInput.value.trim();
+      const dobString = dateOfBirthInput.value; // Recebe como string "YYYY-MM-DD"
+
+      // Converte a string da data para um objeto Date.
+      // O Firebase Firestore converterá este objeto Date em um Timestamp automaticamente.
+      let updatedDateOfBirth = null;
+      if (dobString) {
+        try {
+          updatedDateOfBirth = new Date(dobString);
+          // Verificação básica para garantir que a data é válida
+          if (isNaN(updatedDateOfBirth.getTime())) {
+            throw new Error("Data de nascimento inválida.");
+          }
+        } catch (error) {
+          statusText.innerText = `Erro na data de nascimento: ${error.message}`;
+          return;
+        }
+      }
+
+      try {
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+          name: updatedName,
+          dateOfBirth: updatedDateOfBirth, // Passando um objeto Date ou null
+          placeOfBirth: updatedPlaceOfBirth
+        });
+        statusText.innerText = "Perfil salvo com sucesso!";
+        statusText.className = "status-message success-message"; // Adiciona classe de sucesso
+      } catch (error) {
+        console.error("Erro ao salvar perfil:", error);
+        statusText.innerText = `Erro ao salvar perfil: ${error.message}`;
+      }
+    });
+
+    // --- Sair (Logout) ---
+    logoutButton.addEventListener("click", async () => {
       try {
         await signOut(auth);
         window.location.href = "./index.html"; // Redireciona para a página de login
       } catch (error) {
-        console.error("Erro ao fazer logout:", error);
-        showPageErrorMessage("Erro ao fazer logout. Tente novamente.");
+        console.error("Erro ao sair:", error);
+        statusText.innerText = `Erro ao sair: ${error.message}`;
       }
     });
-
   </script>
 </body>
 </html>
