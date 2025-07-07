@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Perfil ID1</title>
+  <title>Meu Perfil ID1</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -25,9 +25,14 @@
       align-items: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+    header .header-left {
+      display: flex;
+      align-items: center;
+    }
     header h1 {
       margin: 0;
       font-size: 1.8rem;
+      margin-left: 15px; /* Espaço entre o ícone e o título */
     }
     header button {
       background: #e74c3c; /* Vermelho para sair */
@@ -42,19 +47,44 @@
     header button:hover {
       background-color: #c0392b;
     }
+
+    /* Ícone de Perfil no Header */
+    .profile-icon-header {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #4a90e2; /* Cor de fundo para placeholder */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      color: white;
+      cursor: pointer;
+      border: 2px solid white; /* Borda branca */
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+    .profile-icon-header:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    }
+    .profile-icon-header::before {
+      content: "👤"; /* Ícone de usuário simples */
+    }
+
     main {
       flex-grow: 1;
       padding: 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start; /* Alinha ao topo para as abas */
+      justify-content: flex-start;
     }
 
     /* Estilos das Abas */
     .tabs-container {
       width: 100%;
-      max-width: 900px; /* Largura máxima para o conteúdo das abas */
+      max-width: 900px;
       background: #ffffff;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -96,13 +126,13 @@
 
     /* Estilos dos Cards (dentro das abas) */
     .profile-card, .info-card {
-      background: #ffffff; /* Fundo branco, já está no .tabs-container */
-      padding: 0; /* Removido padding extra, já está no .tab-content */
-      border-radius: 8px; /* Já está no .tabs-container */
-      box-shadow: none; /* Removido sombra extra, já está no .tabs-container */
+      background: #ffffff;
+      padding: 0;
+      border-radius: 8px;
+      box-shadow: none;
       width: 100%;
-      max-width: 800px; /* Ajustado para caber dentro do tabs-container */
-      margin: 0 auto; /* Centraliza */
+      max-width: 800px;
+      margin: 0 auto;
       text-align: left;
     }
     .profile-card h2, .info-card h2 {
@@ -216,8 +246,8 @@
       opacity: 1;
     }
 
-    /* Estilos para a homenagem e relógios */
-    .tribute-section, .clock-section {
+    /* Estilos para homenagens e relógios */
+    .time-section {
       background: #fdfdfd;
       border: 1px solid #eee;
       border-radius: 8px;
@@ -226,12 +256,12 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       text-align: center;
     }
-    .tribute-section h3, .clock-section h3 {
+    .time-section h3 {
       color: #34495e;
       margin-bottom: 15px;
       font-size: 1.6rem;
     }
-    .tribute-details p, .clock-display {
+    .time-details p {
       font-size: 1.2rem;
       color: #444;
       margin-bottom: 5px;
@@ -246,30 +276,38 @@
       background: #e0e6ec;
       padding: 10px;
       border-radius: 5px;
-      display: inline-block; /* Para centralizar melhor */
+      display: inline-block;
     }
     .small-text {
       font-size: 0.9rem;
       color: #777;
     }
+    .bold-value {
+        font-weight: bold;
+        color: #007bff; /* Azul para destacar valores */
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>🌟 Perfil ID1</h1>
+    <div class="header-left">
+      <div class="profile-icon-header" id="headerProfileIcon" title="Meu Perfil"></div>
+      <h1>ID1: Identidade Digital Evoluzion</h1>
+    </div>
     <button id="logoutButton">Sair</button>
   </header>
 
   <main>
     <div class="tabs-container">
       <div class="tab-buttons">
-        <button class="tab-button active" data-tab="profile">Meu Perfil</button>
-        <button class="tab-button" data-tab="tvt">TVT (Tempo de Vida Total)</button>
-        <button class="tab-button" data-tab="tvdt">TVDT (Tempo de Vida Digital Total)</button>
+        <button class="tab-button" data-tab="profile">Meu Perfil</button>
         <button class="tab-button" data-tab="documents">Carteira de Documentos</button>
+        <button class="tab-button" data-tab="tvv">TVV</button>
+        <button class="tab-button" data-tab="tvt">TVT</button>
+        <button class="tab-button" data-tab="tvdt">TVDT</button>
       </div>
 
-      <div id="profile-content" class="tab-content">
+      <div id="profile-content" class="tab-content hidden">
         <h2>Meus Dados
           <div class="info-icon-container">
             <span class="info-icon">ℹ️</span>
@@ -304,53 +342,6 @@
         <button id="saveProfileButton" class="button-save">Salvar Perfil</button>
       </div>
 
-      <div id="tvt-content" class="tab-content hidden">
-        <h2>TVT (Tempo de Vida Total)
-          <div class="info-icon-container">
-            <span class="info-icon">ℹ️</span>
-            <div class="info-popup">
-              Aqui você pode ver uma contagem em tempo real de quanto tempo você viveu (se a data de nascimento estiver preenchida), além de uma homenagem à pessoa que mais viveu na história.
-            </div>
-          </div>
-        </h2>
-        <div class="tribute-section">
-          <h3>Homenagem a Jeanne Calment</h3>
-          <p>A pessoa com a vida mais longa verificada na história.</p>
-          <div class="tribute-details">
-            <p><strong>Nome:</strong> Jeanne Louise Calment</p>
-            <p><strong>Viveu:</strong> <span id="calmentYears"></span> anos, <span id="calmentMonths"></span> meses e <span id="calmentDays"></span> dias</p>
-            <p class="small-text">(Total de: <span id="calmentTotalYears"></span> anos | <span id="calmentTotalMonths"></span> meses | <span id="calmentTotalDays"></span> dias)</p>
-          </div>
-        </div>
-
-        <div class="tribute-section" id="myLifeCounterSection">
-          <h3>Seu Tempo de Vida Real</h3>
-          <p class="small-text">(Baseado na sua Data de Nascimento preenchida no Perfil)</p>
-          <div class="clock-display" id="myLifeClock">
-            <span id="myLifeYears">00</span>a <span id="myLifeMonths">00</span>m <span id="myLifeDays">00</span>d <span id="myLifeHours">00</span>h <span id="myLifeMinutes">00</span>m <span id="myLifeSeconds">00</span>s <span id="myLifeMilliseconds">000</span>ms
-          </div>
-          <p class="small-text" id="myLifeTotalDaysDisplay">Você já viveu um total de 0 dias.</p>
-        </div>
-      </div>
-
-      <div id="tvdt-content" class="tab-content hidden">
-        <h2>TVDT (Tempo de Vida Digital Total)
-          <div class="info-icon-container">
-            <span class="info-icon">ℹ️</span>
-            <div class="info-popup">
-              O TVDT representa o tempo total que você dedicou às suas interações e existência no mundo digital. Futuramente, poderá incluir o tempo de uso de apps, redes sociais, etc.
-            </div>
-          </div>
-        </h2>
-        <p>Este é o seu tempo de conexão com o universo digital. Sempre em constante evolução!</p>
-        <div class="clock-section">
-          <h3>Relógio Digital Universal</h3>
-          <div class="clock-display" id="digitalLifeClock">
-            00:00:00.000
-          </div>
-        </div>
-      </div>
-
       <div id="documents-content" class="tab-content hidden">
         <h2>Carteira de Documentos
           <div class="info-icon-container">
@@ -362,6 +353,87 @@
         </h2>
         <p>Sua carteira digital universal para documentos está em desenvolvimento.</p>
         <p>Em breve, você poderá armazenar e acessar seus documentos de forma segura aqui.</p>
+      </div>
+
+      <div id="tvv-content" class="tab-content hidden">
+        <h2>TVV (Tempo de Vida Vivido)
+          <div class="info-icon-container">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-popup">
+              Aqui você pode ver uma contagem em tempo real de quanto tempo você viveu (se a data de nascimento estiver preenchida), além de uma homenagem à pessoa que mais viveu na história.
+            </div>
+          </div>
+        </h2>
+
+        <div class="time-section" id="myLifeCounterSection">
+          <h3>Seu Tempo de Vida Real</h3>
+          <p class="small-text">(Baseado na sua Data de Nascimento preenchida no Perfil)</p>
+          <div class="clock-display" id="myLifeClock">
+            <span id="myLifeYears">00</span>a <span id="myLifeMonths">00</span>m <span id="myLifeDays">00</span>d <span id="myLifeHours">00</span>h <span id="myLifeMinutes">00</span>m <span id="myLifeSeconds">00</span>s <span id="myLifeMilliseconds">000</span>ms
+          </div>
+          <p class="small-text" id="myLifeTotalValues">
+            Você já viveu um total de <span class="bold-value" id="myLifeTotalYears">0</span> anos, 
+            <span class="bold-value" id="myLifeTotalMonths">0</span> meses e 
+            <span class="bold-value" id="myLifeTotalDays">0</span> dias.
+          </p>
+        </div>
+
+        <div class="time-section">
+          <h3>Homenagem a Jeanne Calment</h3>
+          <p>A pessoa com a vida mais longa verificada na história.</p>
+          <div class="time-details">
+            <p><strong>Nome:</strong> Jeanne Louise Calment</p>
+            <p><strong>Viveu:</strong> <span id="calmentYears"></span> anos, <span id="calmentMonths"></span> meses e <span id="calmentDays"></span> dias</p>
+            <p class="small-text">(Total de: <span class="bold-value" id="calmentTotalYears"></span> anos | <span class="bold-value" id="calmentTotalMonths"></span> meses | <span class="bold-value" id="calmentTotalDays"></span> dias)</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="tvt-content" class="tab-content hidden">
+        <h2>TVT (Tempo de Vida Token)
+          <div class="info-icon-container">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-popup">
+              O TVT é o Tempo de Vida Token, uma medida baseada na maior longevidade já registrada, acrescida de um dia. Representa um valor de referência para a potencialidade da vida.
+            </div>
+          </div>
+        </h2>
+        <p>Acompanhe o Tempo de Vida Token, que representa a maior longevidade já registrada, acrescida de um dia!</p>
+        <div class="time-section">
+          <h3>Cálculo do TVT</h3>
+          <p>Fórmula: (MAIOR LONGEVIDADE REGISTRADA + 1 dia)</p>
+          <div class="clock-display" id="tvtDisplay">
+            <span id="tvtYears">00</span>a <span id="tvtMonths">00</span>m <span id="tvtDays">00</span>d <span id="tvtHours">00</span>h <span id="tvtMinutes">00</span>m <span id="tvtSeconds">00</span>s <span id="tvtMilliseconds">000</span>ms
+          </div>
+          <p class="small-text">Este é o valor de referência do TVT.</p>
+        </div>
+      </div>
+
+      <div id="tvdt-content" class="tab-content hidden">
+        <h2>TVDT (Tempo de Vida Destinado às Telas)
+          <div class="info-icon-container">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-popup">
+              O TVDT é o Tempo de Vida Destinado às Telas, calculado com base no tempo que você passa logado no site, multiplicado por dois. Valorize seu tempo!
+            </div>
+          </div>
+        </h2>
+        <p>Acompanhe o tempo que você dedica às telas, valorizando cada segundo!</p>
+        <div class="time-section">
+          <h3>Seu Tempo Logado no Site</h3>
+          <p class="small-text">Este é o tempo acumulado que você permaneceu logado neste site.</p>
+          <div class="clock-display" id="totalLoggedTimeDisplay">
+            <span id="loggedHours">00</span>h <span id="loggedMinutes">00</span>m <span id="loggedSeconds">00</span>s <span id="loggedMilliseconds">000</span>ms
+          </div>
+        </div>
+
+        <div class="time-section">
+          <h3>TVDT Calculado (Tempo Logado x 2)</h3>
+          <p class="small-text">Fórmula: (Seu Tempo Logado no Site x 2)</p>
+          <div class="clock-display" id="tvdtCalculatedDisplay">
+            <span id="tvdtHours">00</span>h <span id="tvdtMinutes">00</span>m <span id="tvdtSeconds">00</span>s <span id="tvdtMilliseconds">000</span>ms
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -405,12 +477,13 @@
     const placeOfBirthInput = document.getElementById("placeOfBirthInput");
     const saveProfileButton = document.getElementById("saveProfileButton");
     const logoutButton = document.getElementById("logoutButton");
+    const headerProfileIcon = document.getElementById("headerProfileIcon");
 
     // DOM Elements - Abas
     const tabButtons = document.querySelectorAll(".tab-button");
     const tabContents = document.querySelectorAll(".tab-content");
 
-    // DOM Elements - Homenagem Jeanne Calment
+    // DOM Elements - Homenagem Jeanne Calment (no TVV)
     const calmentYearsSpan = document.getElementById("calmentYears");
     const calmentMonthsSpan = document.getElementById("calmentMonths");
     const calmentDaysSpan = document.getElementById("calmentDays");
@@ -418,7 +491,7 @@
     const calmentTotalMonthsSpan = document.getElementById("calmentTotalMonths");
     const calmentTotalDaysSpan = document.getElementById("calmentTotalDays");
 
-    // DOM Elements - Seu Tempo de Vida
+    // DOM Elements - Seu Tempo de Vida (no TVV)
     const myLifeCounterSection = document.getElementById("myLifeCounterSection");
     const myLifeYearsSpan = document.getElementById("myLifeYears");
     const myLifeMonthsSpan = document.getElementById("myLifeMonths");
@@ -427,22 +500,53 @@
     const myLifeMinutesSpan = document.getElementById("myLifeMinutes");
     const myLifeSecondsSpan = document.getElementById("myLifeSeconds");
     const myLifeMillisecondsSpan = document.getElementById("myLifeMilliseconds");
-    const myLifeTotalDaysDisplay = document.getElementById("myLifeTotalDaysDisplay");
+    const myLifeTotalYearsSpan = document.getElementById("myLifeTotalYears");
+    const myLifeTotalMonthsSpan = document.getElementById("myLifeTotalMonths");
+    const myLifeTotalDaysSpan = document.getElementById("myLifeTotalDays");
 
-    // DOM Elements - Relógio TVDT
-    const digitalLifeClock = document.getElementById("digitalLifeClock");
+
+    // DOM Elements - TVT
+    const tvtDisplay = document.getElementById("tvtDisplay");
+    const tvtYearsSpan = document.getElementById("tvtYears");
+    const tvtMonthsSpan = document.getElementById("tvtMonths");
+    const tvtDaysSpan = document.getElementById("tvtDays");
+    const tvtHoursSpan = document.getElementById("tvtHours");
+    const tvtMinutesSpan = document.getElementById("tvtMinutes");
+    const tvtSecondsSpan = document.getElementById("tvtSeconds");
+    const tvtMillisecondsSpan = document.getElementById("tvtMilliseconds");
+
+
+    // DOM Elements - TVDT
+    const totalLoggedTimeDisplay = document.getElementById("totalLoggedTimeDisplay");
+    const loggedHoursSpan = document.getElementById("loggedHours");
+    const loggedMinutesSpan = document.getElementById("loggedMinutes");
+    const loggedSecondsSpan = document.getElementById("loggedSeconds");
+    const loggedMillisecondsSpan = document.getElementById("loggedMilliseconds");
+
+    const tvdtCalculatedDisplay = document.getElementById("tvdtCalculatedDisplay");
+    const tvdtHoursSpan = document.getElementById("tvdtHours");
+    const tvdtMinutesSpan = document.getElementById("tvdtMinutes");
+    const tvdtSecondsSpan = document.getElementById("tvdtSeconds");
+    const tvdtMillisecondsSpan = document.getElementById("tvdtMilliseconds");
+
 
     let userBirthDate = null; // Armazena a data de nascimento do usuário para o contador de vida
+    let pageLoadTime = 0; // Hora que a página foi carregada para cálculo de sessão atual
+    let accumulatedDigitalScreenTimeMs = 0; // Tempo total acumulado de uso do site
+    let userHasLoggedInOnce = false; // Flag para a primeira vez que o usuário loga e preenche dados
 
-    // --- Funções de Utilitário de Data ---
-    function pad(num) {
-      return num < 10 ? "0" + num : num;
+
+    // --- Funções de Utilitário de Data e Tempo ---
+
+    // Adiciona padding zero à esquerda
+    function pad(num, length = 2) {
+      return num.toString().padStart(length, '0');
     }
 
     // Calcula diferença entre duas datas em anos, meses e dias exatos
-    function getAge(birthDate, endDate) {
-      const start = new Date(birthDate);
-      const end = new Date(endDate);
+    function getExactAge(birthDate, endDate) {
+      const start = new Date(birthDate.getTime());
+      const end = new Date(endDate.getTime());
 
       let years = end.getFullYear() - start.getFullYear();
       let months = end.getMonth() - start.getMonth();
@@ -450,7 +554,7 @@
 
       if (days < 0) {
         months--;
-        days += new Date(end.getFullYear(), end.getMonth(), 0).getDate(); // Dias no mês anterior
+        days += new Date(end.getFullYear(), end.getMonth(), 0).getDate();
       }
       if (months < 0) {
         years--;
@@ -465,19 +569,67 @@
         const end = new Date(endDate);
 
         const diffTime = Math.abs(end - start); // Diferença em milissegundos
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        const diffMonths = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + (end.getDate() >= start.getDate() ? 0 : -1);
-        const diffYears = end.getFullYear() - start.getFullYear() - ((end.getMonth() < start.getMonth() || (end.getMonth() === start.getMonth() && end.getDate() < start.getDate())) ? 1 : 0);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Usar floor para total de dias completos
         
-        return { totalYears: diffYears, totalMonths: diffMonths, totalDays: diffDays };
+        // Para total de meses e anos, podemos usar a mesma lógica de getExactAge mas sem negativar
+        // Ou uma estimativa baseada em dias médios, mas para "total de" a forma abaixo é mais comum:
+        const totalYears = end.getFullYear() - start.getFullYear() - (end < new Date(end.getFullYear(), start.getMonth(), start.getDate()) ? 1 : 0);
+        const totalMonths = totalYears * 12 + (end.getMonth() - start.getMonth()) - (end.getDate() < start.getDate() ? 1 : 0);
+        
+        return { totalYears, totalMonths, totalDays: diffDays };
     }
 
-    // --- Homenagem a Jeanne Calment ---
-    const calmentBirthDate = new Date("1875-02-21T00:00:00Z"); // UTC para evitar problemas de fuso horário
-    const calmentDeathDate = new Date("1997-08-04T00:00:00Z"); // UTC
+    // Converte milissegundos para formato H:M:S.MS
+    function formatMillisecondsToHMS(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const totalMinutes = Math.floor(totalSeconds / 60);
+      const totalHours = Math.floor(totalMinutes / 60);
+
+      const hours = totalHours;
+      const minutes = totalMinutes % 60;
+      const seconds = totalSeconds % 60;
+      const milliseconds = ms % 1000;
+
+      return {
+        hours: hours,
+        minutes: minutes,
+        seconds: seconds,
+        milliseconds: milliseconds
+      };
+    }
+
+    // Converte milissegundos para formato A:M:D H:M:S.MS
+    function formatMillisecondsToFullAge(ms) {
+      // Implementação para obter anos, meses, dias a partir de milissegundos
+      // É mais preciso usar o cálculo de diferença de datas para anos/meses/dias
+      // e então o restante em horas/minutos/segundos/ms.
+      // Para o TVV do usuário, já temos 'userBirthDate', então vamos usar getExactAge para A/M/D
+      // e o restante do tempo para H/M/S/MS do dia atual.
+      // Esta função será para o TVT/TVDT que são apenas durações em MS.
+
+      const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+      let remainingMs = ms % (1000 * 60 * 60 * 24);
+
+      const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+      remainingMs %= (1000 * 60 * 60);
+
+      const minutes = Math.floor(remainingMs / (1000 * 60));
+      remainingMs %= (1000 * 60);
+
+      const seconds = Math.floor(remainingMs / 1000);
+      const milliseconds = Math.floor(remainingMs % 1000);
+
+      return { days, hours, minutes, seconds, milliseconds };
+    }
+
+
+    // --- Homenagem a Jeanne Calment (no TVV) ---
+    // Datas de Jeanne Calment (GMT/UTC para consistência)
+    const calmentBirthDate = new Date(Date.UTC(1875, 1, 21, 0, 0, 0)); // Mês é 0-indexado, então 1 é fevereiro
+    const calmentDeathDate = new Date(Date.UTC(1997, 7, 4, 0, 0, 0)); // Mês é 0-indexado, então 7 é agosto
 
     function displayCalmentTribute() {
-      const age = getAge(calmentBirthDate, calmentDeathDate);
+      const age = getExactAge(calmentBirthDate, calmentDeathDate);
       calmentYearsSpan.textContent = age.years;
       calmentMonthsSpan.textContent = age.months;
       calmentDaysSpan.textContent = age.days;
@@ -488,21 +640,11 @@
       calmentTotalDaysSpan.textContent = totalDuration.totalDays;
     }
 
-    // --- Relógio TVDT (Digital Universal) ---
-    function updateDigitalLifeClock() {
-      const now = new Date();
-      const hours = pad(now.getHours());
-      const minutes = pad(now.getMinutes());
-      const seconds = pad(now.getSeconds());
-      const milliseconds = pad(now.getMilliseconds(), 3); // Pad com 3 zeros
-
-      digitalLifeClock.textContent = `${hours}:${minutes}:${seconds}.${milliseconds}`;
-    }
-
-    // --- Contador de Vida do Usuário ---
+    // --- Seu Tempo de Vida (no TVV) ---
+    let myLifeInterval;
     function updateMyLifeClock() {
       if (!userBirthDate) {
-        myLifeCounterSection.style.display = 'none'; // Esconde a seção se não houver data de nascimento
+        myLifeCounterSection.style.display = 'none';
         return;
       } else {
         myLifeCounterSection.style.display = 'block';
@@ -511,20 +653,19 @@
       const now = new Date();
       const diffMilliseconds = now - userBirthDate;
 
-      if (diffMilliseconds < 0) { // Caso a data de nascimento seja no futuro
-        myLifeClock.textContent = "Data futura!";
-        myLifeTotalDaysDisplay.textContent = "";
+      if (diffMilliseconds < 0) {
+        myLifeClock.textContent = "Data de nascimento futura!";
+        myLifeTotalValues.textContent = "";
         return;
       }
 
-      // Calcula anos, meses, dias exatos
-      const ageExact = getAge(userBirthDate, now);
+      const ageExact = getExactAge(userBirthDate, now);
       myLifeYearsSpan.textContent = pad(ageExact.years);
       myLifeMonthsSpan.textContent = pad(ageExact.months);
       myLifeDaysSpan.textContent = pad(ageExact.days);
 
       // Calcula horas, minutos, segundos, milissegundos restantes do dia atual
-      let remainingMilliseconds = diffMilliseconds % (1000 * 60 * 60 * 24); // Milissegundos no dia atual
+      let remainingMilliseconds = diffMilliseconds % (1000 * 60 * 60 * 24);
 
       const hours = Math.floor(remainingMilliseconds / (1000 * 60 * 60));
       remainingMilliseconds %= (1000 * 60 * 60);
@@ -538,18 +679,109 @@
       myLifeHoursSpan.textContent = pad(hours);
       myLifeMinutesSpan.textContent = pad(minutes);
       myLifeSecondsSpan.textContent = pad(seconds);
-      myLifeMillisecondsSpan.textContent = pad(milliseconds, 3); // Pad para 3 dígitos
+      myLifeMillisecondsSpan.textContent = pad(milliseconds, 3);
 
-      // Calcula e exibe o total de dias
       const totalDuration = getTotalDuration(userBirthDate, now);
-      myLifeTotalDaysDisplay.textContent = `Você já viveu um total de ${totalDuration.totalDays} dias.`;
+      myLifeTotalYearsSpan.textContent = totalDuration.totalYears;
+      myLifeTotalMonthsSpan.textContent = totalDuration.totalMonths;
+      myLifeTotalDaysSpan.textContent = totalDuration.totalDays;
     }
+
+    // --- TVT (Tempo de Vida Token) ---
+    let tvtInterval;
+    function calculateAndDisplayTVT() {
+      const calmentLifespanMs = calmentDeathDate.getTime() - calmentBirthDate.getTime();
+      const oneDayMs = 24 * 60 * 60 * 1000;
+      const tvtMs = calmentLifespanMs + oneDayMs;
+
+      const duration = formatMillisecondsToFullAge(tvtMs);
+
+      tvtYearsSpan.textContent = getExactAge(calmentBirthDate, new Date(calmentDeathDate.getTime() + oneDayMs)).years;
+      tvtMonthsSpan.textContent = getExactAge(calmentBirthDate, new Date(calmentDeathDate.getTime() + oneDayMs)).months;
+      tvtDaysSpan.textContent = getExactAge(calmentBirthDate, new Date(calmentDeathDate.getTime() + oneDayMs)).days;
+      tvtHoursSpan.textContent = pad(duration.hours);
+      tvtMinutesSpan.textContent = pad(duration.minutes);
+      tvtSecondsSpan.textContent = pad(duration.seconds);
+      tvtMillisecondsSpan.textContent = pad(duration.milliseconds, 3);
+    }
+
+    // --- TVDT (Tempo de Vida Destinado às Telas) ---
+    let tvdtInterval;
+    let currentSessionStartTime = 0; // Marca o início da sessão atual na aba
+    let currentLoggedTimeMs = 0; // Tempo logado na sessão atual
+    
+    // Funções para lidar com o tempo de tela
+    function startScreenTimeTracking() {
+        if (currentLoggedTimeMs === 0) { // Primeira vez na sessão ou reentrada
+            currentSessionStartTime = Date.now();
+        }
+        if (!tvdtInterval) {
+            tvdtInterval = setInterval(() => {
+                if (!document.hidden) { // Apenas conta se a aba está visível
+                    const now = Date.now();
+                    const elapsed = now - currentSessionStartTime;
+                    currentLoggedTimeMs += elapsed;
+                    currentSessionStartTime = now; // Reinicia para a próxima contagem
+
+                    displayTVDTData();
+                }
+            }, 100); // Atualiza a cada 100ms para menor carga, milissegundos ainda visíveis
+        }
+    }
+
+    function stopScreenTimeTracking() {
+        if (tvdtInterval) {
+            clearInterval(tvdtInterval);
+            tvdtInterval = null;
+        }
+        // Ao parar, adiciona o tempo da sessão atual ao total acumulado
+        accumulatedDigitalScreenTimeMs += currentLoggedTimeMs;
+        currentLoggedTimeMs = 0; // Reseta para a sessão atual
+        
+        // Salva no Firestore
+        const user = auth.currentUser;
+        if (user) {
+            updateDoc(doc(db, "users", user.uid), {
+                accumulatedDigitalScreenTimeMs: accumulatedDigitalScreenTimeMs
+            }).catch(error => {
+                console.error("Erro ao salvar tempo de tela:", error);
+            });
+        }
+    }
+
+    // Exibe os dados do TVDT
+    function displayTVDTData() {
+        // Tempo Total Logado (acumulado de sessões anteriores + sessão atual)
+        const totalCurrentLoggedMs = accumulatedDigitalScreenTimeMs + currentLoggedTimeMs;
+        const loggedFormatted = formatMillisecondsToHMS(totalCurrentLoggedMs);
+        loggedHoursSpan.textContent = pad(loggedFormatted.hours);
+        loggedMinutesSpan.textContent = pad(loggedFormatted.minutes);
+        loggedSecondsSpan.textContent = pad(loggedFormatted.seconds);
+        loggedMillisecondsSpan.textContent = pad(loggedFormatted.milliseconds, 3);
+
+        // TVDT Calculado (Tempo Total Logado x 2)
+        const tvdtCalculatedMs = totalCurrentLoggedMs * 2;
+        const tvdtFormatted = formatMillisecondsToHMS(tvdtCalculatedMs);
+        tvdtHoursSpan.textContent = pad(tvdtFormatted.hours);
+        tvdtMinutesSpan.textContent = pad(tvdtFormatted.minutes);
+        tvdtSecondsSpan.textContent = pad(tvdtFormatted.seconds);
+        tvdtMillisecondsSpan.textContent = pad(tvdtFormatted.milliseconds, 3);
+    }
+
 
     // --- Listener de Autenticação ---
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         emailInput.value = user.email || "Não disponível";
         await loadUserProfile(user.uid);
+        
+        // Define a aba 'TVV' como ativa por padrão se o usuário já preencheu dados
+        if (userHasLoggedInOnce) {
+          document.querySelector('.tab-button[data-tab="tvv"]').click();
+        } else {
+          // Se for a primeira vez, mantém no perfil para preencher
+          document.querySelector('.tab-button[data-tab="profile"]').click();
+        }
       } else {
         window.location.href = "./index.html";
       }
@@ -569,21 +801,35 @@
           placeOfBirthInput.value = currentUserData.placeOfBirth || "";
 
           if (currentUserData.dateOfBirth && typeof currentUserData.dateOfBirth.toDate === 'function') {
-            userBirthDate = currentUserData.dateOfBirth.toDate(); // Armazena para o contador de vida
+            userBirthDate = currentUserData.dateOfBirth.toDate();
             dateOfBirthInput.value = userBirthDate.toISOString().split('T')[0];
           } else {
             dateOfBirthInput.value = "";
-            userBirthDate = null; // Reinicia se não for válida
+            userBirthDate = null;
           }
+          
+          accumulatedDigitalScreenTimeMs = currentUserData.accumulatedDigitalScreenTimeMs || 0;
+
+          // Se o nome e a data de nascimento já foram preenchidos, consideramos que o usuário já "preencheu os dados"
+          if (currentUserData.name && currentUserData.dateOfBirth) {
+            userHasLoggedInOnce = true;
+          } else {
+            userHasLoggedInOnce = false;
+          }
+
           statusText.innerText = "";
         } else {
           statusText.innerText = "Documento de perfil não encontrado. Crie um novo.";
           userBirthDate = null;
+          accumulatedDigitalScreenTimeMs = 0;
+          userHasLoggedInOnce = false;
         }
       } catch (error) {
         console.error("Erro ao carregar perfil:", error);
         statusText.innerText = `Erro ao carregar perfil: ${error.message}`;
         userBirthDate = null;
+        accumulatedDigitalScreenTimeMs = 0;
+        userHasLoggedInOnce = false;
       }
     }
 
@@ -605,7 +851,8 @@
       let updatedDateOfBirth = null;
       if (dobString) {
         try {
-          updatedDateOfBirth = new Date(dobString + "T00:00:00"); // Adiciona T00:00:00 para garantir que seja salva como UTC meia-noite
+          // Garante que a data seja salva como UTC meia-noite para consistência
+          updatedDateOfBirth = new Date(dobString + "T00:00:00Z"); 
           if (isNaN(updatedDateOfBirth.getTime())) {
             throw new Error("Data de nascimento inválida.");
           }
@@ -621,9 +868,15 @@
           name: updatedName,
           dateOfBirth: updatedDateOfBirth,
           placeOfBirth: updatedPlaceOfBirth
-        });
-        // Atualiza a variável userBirthDate após salvar com sucesso
-        userBirthDate = updatedDateOfBirth;
+        }, { merge: true }); // Usar merge para não sobrescrever outros campos
+
+        userBirthDate = updatedDateOfBirth; // Atualiza a variável local
+        
+        // Verifica se os dados essenciais foram preenchidos para setar userHasLoggedInOnce
+        if (updatedName && updatedDateOfBirth) {
+            userHasLoggedInOnce = true;
+        }
+
         statusText.innerText = "Perfil salvo com sucesso!";
         statusText.className = "status-message success-message";
       } catch (error) {
@@ -634,6 +887,7 @@
 
     // --- Sair (Logout) ---
     logoutButton.addEventListener("click", async () => {
+      stopScreenTimeTracking(); // Salva o tempo de tela antes de sair
       try {
         await signOut(auth);
         window.location.href = "./index.html";
@@ -648,54 +902,51 @@
       button.addEventListener("click", () => {
         const targetTab = button.dataset.tab;
 
-        // Remove a classe 'active' de todos os botões e 'hidden' de todos os conteúdos
         tabButtons.forEach(btn => btn.classList.remove("active"));
         tabContents.forEach(content => content.classList.add("hidden"));
 
-        // Adiciona a classe 'active' ao botão clicado
         button.classList.add("active");
-        // Remove a classe 'hidden' do conteúdo da aba correspondente
         document.getElementById(`${targetTab}-content`).classList.remove("hidden");
 
-        // Atualiza os relógios apenas quando a aba correspondente está visível
-        if (targetTab === 'tvt') {
-          // Garante que o contador de vida seja inicializado/atualizado ao entrar na aba TVT
-          updateMyLifeClock(); // Chama para exibir ou esconder a seção
-          // Inicia os intervalos para TVT e TVDT apenas se ainda não estiverem ativos
-          if (!window.tvtInterval) {
-            window.tvtInterval = setInterval(updateMyLifeClock, 10);
-          }
-        } else {
-          // Limpa o intervalo do TVT se sair da aba
-          if (window.tvtInterval) {
-            clearInterval(window.tvtInterval);
-            window.tvtInterval = null;
-          }
-        }
+        // Gerencia os intervalos dos relógios
+        if (myLifeInterval) clearInterval(myLifeInterval);
+        if (tvtInterval) clearInterval(tvtInterval);
+        if (tvdtInterval) clearInterval(tvdtInterval);
+        stopScreenTimeTracking(); // Para e salva o tempo de tela ao trocar de aba
 
-        if (targetTab === 'tvdt') {
-          if (!window.tvdtInterval) {
-            window.tvdtInterval = setInterval(updateDigitalLifeClock, 10);
-          }
-        } else {
-          // Limpa o intervalo do TVDT se sair da aba
-          if (window.tvdtInterval) {
-            clearInterval(window.tvdtInterval);
-            window.tvdtInterval = null;
-          }
+        if (targetTab === 'tvv') {
+          updateMyLifeClock(); // Chama uma vez para inicializar
+          myLifeInterval = setInterval(updateMyLifeClock, 10);
+        } else if (targetTab === 'tvt') {
+          calculateAndDisplayTVT(); // Calcula e exibe TVT
+          // TVT não é um relógio vivo em milissegundos no sentido de tempo decorrido, mas uma duração fixa
+          // Se quiser que ele "pisque" milissegundos, podemos simular:
+          tvtInterval = setInterval(calculateAndDisplayTVT, 10); // Para simular um "relógio" em ms
+        } else if (targetTab === 'tvdt') {
+            startScreenTimeTracking(); // Inicia o rastreamento do tempo de tela
+            displayTVDTData(); // Exibe os dados iniciais
         }
       });
+    });
+
+    // --- Ícone de Perfil no Header ---
+    headerProfileIcon.addEventListener("click", () => {
+        document.querySelector('.tab-button[data-tab="profile"]').click();
     });
 
     // --- Inicialização ao Carregar a Página ---
     document.addEventListener("DOMContentLoaded", () => {
       displayCalmentTribute(); // Exibe a homenagem a Jeanne Calment
-
-      // Define a aba 'Meu Perfil' como ativa por padrão ao carregar
-      document.querySelector('.tab-button[data-tab="profile"]').click();
       
-      // Os relógios serão iniciados quando as abas correspondentes forem clicadas.
+      // O onAuthStateChanged vai decidir qual aba abrir inicialmente
+      // E ele carrega os dados do perfil, incluindo accumulatedDigitalScreenTimeMs
     });
+
+    // --- Salvar tempo de tela acumulado ao fechar/navegar na página ---
+    window.addEventListener('beforeunload', () => {
+        stopScreenTimeTracking(); // Garante que o tempo da sessão atual seja salvo
+    });
+
   </script>
 </body>
 </html>
