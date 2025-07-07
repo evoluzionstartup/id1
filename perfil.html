@@ -3,79 +3,289 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Perfil ID1</title>
+  <title>Perfil ID1 | Carteira e Ampulheta Digital</title>
   <style>
-    /* Estilos básicos para a página de perfil */
+    /* Reset básico e estilos gerais */
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 2rem;
-      background: #f0f0f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #eef1f6;
+      color: #333;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      align-items: center;
+    }
+    .container {
+      max-width: 960px;
+      width: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h1, h2, h3 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin-bottom: 25px;
+    }
+    .grid-2-cols {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media (min-width: 768px) {
+      .grid-2-cols {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .button {
+      background: #4a90e2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+      display: inline-block;
+      margin-top: 10px;
+    }
+    .button:hover {
+      background-color: #357bd8;
+    }
+    .button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .danger-button {
+      background: #e74c3c;
+    }
+    .danger-button:hover {
+      background-color: #c0392b;
+    }
+    input[type="date"],
+    input[type="number"],
+    input[type="file"] {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+      text-align: left;
+    }
+    .document-list ul {
+      list-style: none;
+      padding: 0;
+    }
+    .document-list li {
+      background: #f9f9f9;
+      border: 1px solid #eee;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .document-list li a {
+      color: #4a90e2;
+      text-decoration: none;
+      word-break: break-all;
+    }
+    .document-list li a:hover {
+      text-decoration: underline;
+    }
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border-left-color: #4a90e2;
+      animation: spin 1s ease infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    #loadingMessage, #errorMessage {
+      text-align: center;
+      padding: 20px;
+      font-size: 1.1rem;
+      color: #555;
+    }
+    #errorMessage {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    #profileContent {
+      display: none; /* Esconde até o usuário ser carregado */
+    }
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1000; /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
       justify-content: center;
       align-items: center;
     }
-    .card {
-      background: white;
-      padding: 2rem;
+    .modal-content {
+      background-color: #fefefe;
       margin: auto;
-      max-width: 600px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 90%; /* Responsividade básica */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%; /* Could be more responsive */
+      max-width: 500px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      text-align: center;
     }
-    h1 {
-      margin-bottom: 1rem;
-      color: #333;
+    .modal-content h3 {
+        margin-top: 0;
     }
-    p {
-      margin: 0.5rem 0;
-      color: #555;
+    .modal-content input {
+        margin-bottom: 15px;
     }
-    strong {
-        color: #0c0c0c;
+    .stat-item {
+        background: #f8fbfd;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #e0e6ed;
+        margin-bottom: 10px;
     }
-    #logoutBtn {
-      background: #dc3545; /* Vermelho para sair */
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 1.5rem;
-      font-size: 1rem;
-      transition: background-color 0.3s ease;
+    .stat-item strong {
+        display: block;
+        font-size: 1.2em;
+        color: #2c3e50;
+        margin-bottom: 5px;
     }
-    #logoutBtn:hover {
-      background-color: #c82333;
+    .stat-item span {
+        font-size: 0.9em;
+        color: #7f8c8d;
     }
-    #loadingMessage, #errorMessage {
-        font-style: italic;
-        color: #555;
-        margin-top: 1rem;
-    }
-    #errorMessage {
-        color: red;
-    }
-    #profileContent {
-        display: none; /* Esconde o conteúdo até o usuário ser verificado */
+    #documentTypeSelect {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>🌟 Perfil Evoluzion</h1>
-    <p id="loadingMessage">Carregando dados do perfil...</p>
+  <div class="container">
+    <h1 class="header-title">🌟 Perfil ID1 | Sua Identidade Digital</h1>
+
+    <p id="loadingMessage">Carregando dados do perfil... <span class="spinner"></span></p>
     <p id="errorMessage" style="display: none;"></p>
 
     <div id="profileContent">
-        <p>Bem-vindo(a), <strong id="userName"></strong>!</p>
-        <p>E-mail: <strong id="userEmail"></strong></p>
-        <p>Aqui você poderá visualizar seus dados, documentos e acessar sua carteira digital.</p>
-        <p>Mais recursos estarão disponíveis em breve.</p>
-        <button id="logoutBtn">Sair</button>
+      <div class="grid-2-cols">
+        <div class="card">
+          <h2>Dados do Perfil</h2>
+          <p><strong>Nome:</strong> <span id="userName"></span></p>
+          <p><strong>E-mail:</strong> <span id="userEmail"></span></p>
+          <p><strong>Membro desde:</strong> <span id="memberSince"></span></p>
+          <button id="logoutBtn" class="button danger-button">Sair</button>
+        </div>
+
+        <div class="card">
+          <h2>Ampulheta Digital</h2>
+          <div class="stat-item">
+            <strong><span id="daysLivedDisplay">0</span> dias</strong>
+            <span>Você já viveu</span>
+          </div>
+          <div class="stat-item">
+            <strong>TVT Atribuído: <span id="tvtTotalAttributedDisplay">0</span> dias</strong>
+            <span>Tempo de Vida Total (Base + Vivido + Bônus)</span>
+          </div>
+          <div class="stat-item">
+            <strong>TVDT Bruto: <span id="tvdtRawScreenTimeDisplay">0</span> horas</strong>
+            <span>Tempo de Vida Dedicado a Telas (horas)</span>
+          </div>
+          <div class="stat-item">
+            <strong>TVDT Token: <span id="tvdtTokenValueDisplay">0</span></strong>
+            <span>(Tempo de Tela x 2)</span>
+          </div>
+
+          <h3>Registrar Tempo de Tela</h3>
+          <label for="screenTimeInput">Horas Diárias nas Telas:</label>
+          <input type="number" id="screenTimeInput" min="0" max="24" step="0.1" placeholder="Ex: 5.5">
+          <button id="recordScreenTimeBtn" class="button">Registrar Tempo</button>
+          <p id="screenTimeStatus" style="font-size: 0.9em; color: #7f8c8d; margin-top: 5px;"></p>
+        </div>
+      </div>
+
+      <div class="grid-2-cols">
+        <div class="card">
+          <h2>Carteira de Documentos</h2>
+          <p>Guarde cópias dos seus documentos com segurança.</p>
+          <label for="documentTypeSelect">Tipo de Documento:</label>
+          <select id="documentTypeSelect">
+            <option value="">Selecione...</option>
+            <option value="CNH">CNH</option>
+            <option value="RG">RG</option>
+            <option value="CPF">CPF</option>
+            <option value="Comprovante de Residencia">Comprovante de Residência</option>
+            <option value="Outros">Outros</option>
+          </select>
+          <label for="documentUploadInput">Selecionar Arquivo:</label>
+          <input type="file" id="documentUploadInput" accept="image/*,.pdf">
+          <button id="uploadDocumentBtn" class="button">Fazer Upload</button>
+          <p id="uploadStatus" style="font-size: 0.9em; color: #7f8c8d; margin-top: 5px;"></p>
+
+          <h3>Meus Documentos</h3>
+          <div class="document-list">
+            <ul id="uploadedDocumentsList">
+              <li>Nenhum documento enviado ainda.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Provas e Renda Universal</h2>
+          <p>Realize as provas para acessar a Renda Universal.</p>
+          <p>Seu "mais valor" é adicionado a cada Prova de Vida.</p>
+
+          <h3>Prova de Vida</h3>
+          <button id="proofOfLifeBtn" class="button">Realizar Prova de Vida</button>
+          <p id="proofOfLifeStatus" style="font-size: 0.9em; color: #7f8c8d; margin-top: 5px;"></p>
+          
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dobModal" class="modal">
+    <div class="modal-content">
+      <h3>Por favor, insira sua data de nascimento</h3>
+      <p>Precisamos desta informação para calcular seu Tempo de Vida Total (TVT).</p>
+      <label for="dobInput">Data de Nascimento:</label>
+      <input type="date" id="dobInput">
+      <button id="saveDobBtn" class="button">Salvar Data de Nascimento</button>
+      <p id="dobStatus" style="font-size: 0.9em; color: #e74c3c; margin-top: 5px;"></p>
     </div>
   </div>
 
@@ -83,11 +293,13 @@
     // Importações do Firebase SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-    // Sua configuração do Firebase (deve ser a mesma do index.html)
+    // Sua configuração do Firebase (Mesma do index.html)
+    // EM PRODUÇÃO, USE VARIÁVEIS DE AMBIENTE PARA A CHAVE API E OUTROS DADOS SENSÍVEIS!
     const firebaseConfig = {
-      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk", // CONSIDERE USAR VARIÁVEIS DE AMBIENTE AQUI
+      apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
       authDomain: "evoluzion-id1.firebaseapp.com",
       projectId: "evoluzion-id1",
       storageBucket: "evoluzion-id1.appspot.com",
@@ -99,72 +311,346 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const userNameElem = document.getElementById("userName");
-      const userEmailElem = document.getElementById("userEmail");
-      const logoutBtn = document.getElementById("logoutBtn");
-      const loadingMessage = document.getElementById("loadingMessage");
-      const errorMessage = document.getElementById("errorMessage");
-      const profileContent = document.getElementById("profileContent");
+    // --- Constantes Globais ---
+    // Recorde mundial de longevidade (Jeanne Calment): 122 anos e 164 dias
+    // Calculado como 44724 dias.
+    const TVT_BASE_DAYS = 44724; 
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
-      // Função para exibir mensagem de erro
-      function showErrorMessage(message) {
-          loadingMessage.style.display = 'none';
-          profileContent.style.display = 'none';
-          errorMessage.innerText = message;
-          errorMessage.style.display = 'block';
-      }
+    // --- Elementos DOM ---
+    const userNameElem = document.getElementById("userName");
+    const userEmailElem = document.getElementById("userEmail");
+    const memberSinceElem = document.getElementById("memberSince");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loadingMessage = document.getElementById("loadingMessage");
+    const errorMessage = document.getElementById("errorMessage");
+    const profileContent = document.getElementById("profileContent");
 
-      // Event Listener para o botão de Sair
-      logoutBtn.addEventListener("click", async () => {
-        try {
-          await signOut(auth);
-          window.location.href = "./index.html"; // Redireciona para a página de login
-        } catch (error) {
-          console.error("Erro ao fazer logout:", error);
-          showErrorMessage("Erro ao fazer logout. Tente novamente.");
-        }
-      });
+    // Ampulheta Digital
+    const daysLivedDisplay = document.getElementById("daysLivedDisplay");
+    const tvtTotalAttributedDisplay = document.getElementById("tvtTotalAttributedDisplay");
+    const tvdtRawScreenTimeDisplay = document.getElementById("tvdtRawScreenTimeDisplay");
+    const tvdtTokenValueDisplay = document.getElementById("tvdtTokenValueDisplay");
+    const screenTimeInput = document.getElementById("screenTimeInput");
+    const recordScreenTimeBtn = document.getElementById("recordScreenTimeBtn");
+    const screenTimeStatus = document.getElementById("screenTimeStatus");
 
-      // Listener para o estado de autenticação do Firebase
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          // Usuário está logado
-          loadingMessage.style.display = 'none'; // Esconde a mensagem de carregamento
-          errorMessage.style.display = 'none'; // Esconde qualquer mensagem de erro
-          profileContent.style.display = 'block'; // Mostra o conteúdo do perfil
+    // Carteira de Documentos
+    const documentTypeSelect = document.getElementById("documentTypeSelect");
+    const documentUploadInput = document.getElementById("documentUploadInput");
+    const uploadDocumentBtn = document.getElementById("uploadDocumentBtn");
+    const uploadStatus = document.getElementById("uploadStatus");
+    const uploadedDocumentsList = document.getElementById("uploadedDocumentsList");
 
-          userNameElem.innerText = user.displayName || "Nome não disponível";
-          userEmailElem.innerText = user.email || "E-mail não disponível";
+    // Provas
+    const proofOfLifeBtn = document.getElementById("proofOfLifeBtn");
+    const proofOfLifeStatus = document.getElementById("proofOfLifeStatus");
 
-          // Opcional: Buscar dados adicionais do usuário no Firestore
-          try {
-            const userRef = doc(db, "users", user.uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-              const userData = userSnap.data();
-              console.log("Dados do usuário no Firestore:", userData);
-              // Você pode exibir outros dados do usuário aqui, por exemplo:
-              // const userCreatedAtElem = document.createElement('p');
-              // userCreatedAtElem.innerText = `Criado em: ${new Date(userData.createdAt.toDate()).toLocaleDateString()}`;
-              // profileContent.appendChild(userCreatedAtElem);
+    // Modal Data de Nascimento
+    const dobModal = document.getElementById("dobModal");
+    const dobInput = document.getElementById("dobInput");
+    const saveDobBtn = document.getElementById("saveDobBtn");
+    const dobStatus = document.getElementById("dobStatus");
+
+    let currentUser = null; // Variável para armazenar o usuário logado
+
+    // --- Funções de Utilidade ---
+
+    // Exibir mensagem de erro na página
+    function showPageErrorMessage(message) {
+      loadingMessage.style.display = 'none';
+      profileContent.style.display = 'none';
+      errorMessage.innerText = message;
+      errorMessage.style.display = 'block';
+    }
+
+    // Calcular dias vividos
+    function calculateDaysLived(dateOfBirth) {
+        if (!dateOfBirth) return 0;
+        const birthDate = new Date(dateOfBirth);
+        const today = new Date();
+        const diffTime = Math.abs(today.getTime() - birthDate.getTime());
+        return Math.ceil(diffTime / MS_PER_DAY);
+    }
+
+    // Formatar segundos em HH:MM:SS
+    function formatSeconds(totalSeconds) {
+        if (totalSeconds < 0) totalSeconds = 0;
+        const hours = Math.floor(totalSeconds / 3600);
+        totalSeconds %= 3600;
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = Math.floor(totalSeconds % 60);
+        return `${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    // --- Funções de Interação com Firebase ---
+
+    // Função para buscar e exibir dados do perfil e ampulheta digital
+    async function loadUserProfile(user) {
+        const userDocRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userDocRef);
+
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            currentUser = userData; // Salva os dados do usuário globalmente
+
+            userNameElem.innerText = userData.name || "Não informado";
+            userEmailElem.innerText = userData.email || "Não informado";
+            memberSinceElem.innerText = userData.createdAt ? new Date(userData.createdAt.toDate()).toLocaleDateString() : "N/A";
+
+            // --- Gerenciamento da Data de Nascimento ---
+            if (!userData.dateOfBirth) {
+                dobModal.style.display = 'flex'; // Exibe o modal
             } else {
-              console.log("Documento do usuário não encontrado no Firestore.");
+                dobModal.style.display = 'none'; // Esconde o modal se já tiver
+                updateDigitalHourglassDisplay(userData);
             }
-          } catch (firestoreError) {
-            console.error("Erro ao buscar dados do Firestore:", firestoreError);
-            showErrorMessage("Erro ao carregar dados adicionais do perfil.");
-          }
+            
+            // Carregar e exibir documentos
+            loadUserDocuments(user.uid);
 
         } else {
-          // Usuário não está logado, redirecionar ou mostrar mensagem
-          console.log("Usuário não logado. Redirecionando para a página inicial.");
-          alert("Você precisa estar logado para acessar esta página.");
-          window.location.href = "./index.html";
+            showPageErrorMessage("Dados do usuário não encontrados. Por favor, tente novamente ou entre em contato com o suporte.");
         }
-      });
+    }
+
+    // Função para atualizar a exibição da ampulheta digital
+    function updateDigitalHourglassDisplay(userData) {
+        const daysLived = userData.dateOfBirth ? calculateDaysLived(userData.dateOfBirth) : 0;
+        const tvtBonusDays = userData.tvt_bonus_days || 0;
+        const tvtTotalAttributed = TVT_BASE_DAYS + daysLived + tvtBonusDays;
+
+        daysLivedDisplay.innerText = daysLived;
+        tvtTotalAttributedDisplay.innerText = tvtTotalAttributed;
+        
+        // TVDT
+        const tvdtRawScreenTimeSeconds = userData.tvdt_screen_time_seconds || 0;
+        const tvdtTokenValueSeconds = tvdtRawScreenTimeSeconds * 2;
+
+        tvdtRawScreenTimeDisplay.innerText = formatSeconds(tvdtRawScreenTimeSeconds);
+        tvdtTokenValueDisplay.innerText = formatSeconds(tvdtTokenValueSeconds);
+    }
+
+    // Função para salvar a data de nascimento
+    saveDobBtn.addEventListener("click", async () => {
+        const dob = dobInput.value;
+        if (!dob) {
+            dobStatus.innerText = "Por favor, selecione uma data.";
+            return;
+        }
+        if (!currentUser || !currentUser.uid) {
+            dobStatus.innerText = "Erro: Usuário não identificado. Recarregue a página.";
+            return;
+        }
+
+        try {
+            await updateDoc(doc(db, "users", currentUser.uid), {
+                dateOfBirth: new Date(dob) // Salva como timestamp do Firebase
+            });
+            currentUser.dateOfBirth = new Date(dob); // Atualiza o objeto local
+            updateDigitalHourglassDisplay(currentUser);
+            dobModal.style.display = 'none';
+            dobStatus.innerText = "";
+        } catch (error) {
+            console.error("Erro ao salvar data de nascimento:", error);
+            dobStatus.innerText = "Erro ao salvar data. Tente novamente.";
+        }
     });
+
+    // Função para registrar tempo de tela
+    recordScreenTimeBtn.addEventListener("click", async () => {
+        if (!currentUser || !currentUser.uid) {
+            screenTimeStatus.innerText = "Erro: Usuário não logado.";
+            return;
+        }
+
+        const screenTimeHours = parseFloat(screenTimeInput.value);
+        if (isNaN(screenTimeHours) || screenTimeHours < 0 || screenTimeHours > 24) {
+            screenTimeStatus.innerText = "Por favor, insira um número válido de horas (0-24).";
+            return;
+        }
+        const screenTimeSeconds = screenTimeHours * 3600; // Converte horas para segundos
+
+        recordScreenTimeBtn.disabled = true;
+        screenTimeStatus.innerText = "Registrando...";
+
+        try {
+            const userDocRef = doc(db, "users", currentUser.uid);
+            // Incrementa o tempo de tela existente
+            const currentScreenTimeSeconds = currentUser.tvdt_screen_time_seconds || 0;
+            const newScreenTimeSeconds = currentScreenTimeSeconds + screenTimeSeconds;
+
+            await updateDoc(userDocRef, {
+                tvdt_screen_time_seconds: newScreenTimeSeconds,
+                last_tvdt_update: new Date()
+            });
+
+            currentUser.tvdt_screen_time_seconds = newScreenTimeSeconds; // Atualiza localmente
+            updateDigitalHourglassDisplay(currentUser); // Atualiza a exibição
+
+            screenTimeStatus.innerText = "Tempo registrado com sucesso!";
+            screenTimeInput.value = ""; // Limpa o input
+        } catch (error) {
+            console.error("Erro ao registrar tempo de tela:", error);
+            screenTimeStatus.innerText = "Erro ao registrar tempo. Tente novamente.";
+        } finally {
+            recordScreenTimeBtn.disabled = false;
+        }
+    });
+
+
+    // Função para upload de documentos
+    uploadDocumentBtn.addEventListener("click", async () => {
+        if (!currentUser || !currentUser.uid) {
+            uploadStatus.innerText = "Erro: Usuário não logado.";
+            return;
+        }
+
+        const file = documentUploadInput.files[0];
+        const documentType = documentTypeSelect.value;
+
+        if (!file) {
+            uploadStatus.innerText = "Por favor, selecione um arquivo.";
+            return;
+        }
+        if (!documentType) {
+            uploadStatus.innerText = "Por favor, selecione o tipo de documento.";
+            return;
+        }
+
+        uploadDocumentBtn.disabled = true;
+        uploadStatus.innerText = "Fazendo upload...";
+
+        try {
+            // Cria um caminho único no Storage
+            const storagePath = `users/${currentUser.uid}/documents/${documentType}_${Date.now()}_${file.name}`;
+            const storageRef = ref(storage, storagePath);
+
+            // Faz o upload do arquivo
+            const snapshot = await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+
+            // Salva os metadados no Firestore
+            const documentsCollectionRef = collection(db, "users", currentUser.uid, "documents");
+            await setDoc(doc(documentsCollectionRef), { // Adiciona um novo documento com ID automático
+                type: documentType,
+                filename: file.name,
+                storagePath: storagePath,
+                downloadURL: downloadURL,
+                uploadDate: new Date(),
+                status: "Pendente" // Ou "Em Revisão", "Verificado", etc.
+            });
+
+            uploadStatus.innerText = "Documento enviado com sucesso!";
+            documentUploadInput.value = ""; // Limpa o input do arquivo
+            documentTypeSelect.value = ""; // Limpa o tipo selecionado
+            loadUserDocuments(currentUser.uid); // Recarrega a lista de documentos
+        } catch (error) {
+            console.error("Erro ao fazer upload:", error);
+            uploadStatus.innerText = `Erro ao fazer upload: ${error.message}`;
+        } finally {
+            uploadDocumentBtn.disabled = false;
+        }
+    });
+
+    // Função para carregar e exibir documentos do usuário
+    async function loadUserDocuments(uid) {
+        uploadedDocumentsList.innerHTML = '<li>Carregando documentos... <span class="spinner"></span></li>';
+        const documentsCollectionRef = collection(db, "users", uid, "documents");
+        const q = query(documentsCollectionRef, orderBy("uploadDate", "desc"));
+
+        try {
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+                uploadedDocumentsList.innerHTML = '<li>Nenhum documento enviado ainda.</li>';
+                return;
+            }
+
+            uploadedDocumentsList.innerHTML = ''; // Limpa a lista
+            querySnapshot.forEach((doc) => {
+                const docData = doc.data();
+                const listItem = document.createElement("li");
+                listItem.innerHTML = `
+                    <span>${docData.type}: <a href="${docData.downloadURL}" target="_blank" rel="noopener noreferrer">${docData.filename}</a></span>
+                    <small>(${new Date(docData.uploadDate.toDate()).toLocaleDateString()}) - Status: ${docData.status}</small>
+                `;
+                uploadedDocumentsList.appendChild(listItem);
+            });
+        } catch (error) {
+            console.error("Erro ao carregar documentos:", error);
+            uploadedDocumentsList.innerHTML = '<li>Erro ao carregar documentos.</li>';
+        }
+    }
+
+    // Função para Realizar Prova de Vida
+    proofOfLifeBtn.addEventListener("click", async () => {
+        if (!currentUser || !currentUser.uid) {
+            proofOfLifeStatus.innerText = "Erro: Usuário não logado.";
+            return;
+        }
+
+        proofOfLifeBtn.disabled = true;
+        proofOfLifeStatus.innerText = "Realizando prova de vida...";
+
+        try {
+            const userDocRef = doc(db, "users", currentUser.uid);
+            // Incrementa tvt_bonus_days em 1
+            const currentBonusDays = currentUser.tvt_bonus_days || 0;
+            const newBonusDays = currentBonusDays + 1;
+
+            await updateDoc(userDocRef, {
+                tvt_bonus_days: newBonusDays
+            });
+            currentUser.tvt_bonus_days = newBonusDays; // Atualiza o objeto local
+
+            // Registra o log da prova
+            const proofsLogsCollectionRef = collection(db, "users", currentUser.uid, "proofs_logs");
+            await setDoc(doc(proofsLogsCollectionRef), {
+                type: "proof_of_life",
+                timestamp: new Date(),
+                details: { days_added: 1, method: "manual_click" }, // Pode ser expandido com métodos de verificação reais
+                tvt_snapshot_at_event: TVT_BASE_DAYS + calculateDaysLived(currentUser.dateOfBirth) + newBonusDays
+            });
+
+            updateDigitalHourglassDisplay(currentUser); // Atualiza a exibição
+            proofOfLifeStatus.innerText = "Prova de vida realizada! +1 dia de valor atribuído!";
+        } catch (error) {
+            console.error("Erro ao realizar prova de vida:", error);
+            proofOfLifeStatus.innerText = "Erro ao realizar prova de vida. Tente novamente.";
+        } finally {
+            proofOfLifeBtn.disabled = false;
+        }
+    });
+
+    // --- Listener de Autenticação Global ---
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Usuário logado
+        console.log("Usuário logado:", user.displayName, user.uid);
+        loadingMessage.style.display = 'none';
+        errorMessage.style.display = 'none';
+        profileContent.style.display = 'block'; // Mostra o conteúdo do perfil
+        await loadUserProfile(user); // Carrega os dados do perfil
+      } else {
+        // Usuário não logado, redirecionar
+        alert("Você precisa estar logado para acessar esta página. Redirecionando...");
+        window.location.href = "./index.html";
+      }
+    });
+
+    // --- Logout ---
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "./index.html"; // Redireciona para a página de login
+      } catch (error) {
+        console.error("Erro ao fazer logout:", error);
+        showPageErrorMessage("Erro ao fazer logout. Tente novamente.");
+      }
+    });
+
   </script>
 </body>
 </html>
