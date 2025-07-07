@@ -276,28 +276,12 @@
       <div class="grid-2-cols">
         <div class="card">
           <h2>Carteira de Documentos</h2>
-          <p>Guarde cópias dos seus documentos com segurança.</p>
-          <label for="documentTypeSelect">Tipo de Documento:</label>
-          <select id="documentTypeSelect">
-            <option value="">Selecione...</option>
-            <option value="CNH">CNH</option>
-            <option value="RG">RG</option>
-            <option value="CPF">CPF</option>
-            <option value="Comprovante de Residencia">Comprovante de Residência</option>
-            <option value="Outros">Outros</option>
-          </select>
-          <label for="documentUploadInput">Selecionar Arquivo:</label>
-          <input type="file" id="documentUploadInput" accept="image/*,.pdf">
-          <button id="uploadDocumentBtn" class="button">Fazer Upload</button>
-          <p id="uploadStatus" style="font-size: 0.9em; color: #7f8c8d; margin-top: 5px;"></p>
-
-          <h3>Meus Documentos</h3>
-          <div class="document-list">
-            <ul id="uploadedDocumentsList">
-              <li>Nenhum documento enviado ainda.</li>
-            </ul>
-          </div>
+          <p style="text-align: center; color: #666; margin: 20px 0;">
+            A funcionalidade de Carteira de Documentos está em desenvolvimento.<br>
+            Em breve você poderá armazenar seus documentos aqui de forma segura!
+          </p>
         </div>
+
 
         <div class="card">
           <h2>Provas e Renda Universal</h2>
@@ -329,9 +313,11 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+    // O import do Storage foi removido/comentado aqui para evitar o problema de upgrade
+    // import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
     // Sua configuração do Firebase (Mesma do index.html)
+    // GARANTA QUE ESTA firebaseConfig SEJA EXATAMENTE A QUE VOCÊ PEGOU DO SEU CONSOLE DO FIREBASE
     // EM PRODUÇÃO, USE VARIÁVEIS DE AMBIENTE PARA A CHAVE API E OUTROS DADOS SENSÍVEIS!
     const firebaseConfig = {
       apiKey: "AIzaSyDUOF7BZIBNfJBXVmT2MGMMF6EBnUfsesk",
@@ -346,7 +332,8 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
+    // O Storage não é inicializado aqui para evitar o pedido de upgrade
+    // const storage = getStorage(app);
 
     // --- Constantes Globais ---
     const TVT_BASE_DAYS = 44724; // Jeanne Calment: 122 anos e 164 dias
@@ -356,22 +343,22 @@
     // Display Mode
     const userNameElem = document.getElementById("userName");
     const userEmailElem = document.getElementById("userEmail");
-    const userLoginMethodElem = document.getElementById("userLoginMethod"); // NOVO
+    const userLoginMethodElem = document.getElementById("userLoginMethod");
     const memberSinceElem = document.getElementById("memberSince");
-    const userDobDisplay = document.getElementById("userDobDisplay"); // NOVO
-    const userPobDisplay = document.getElementById("userPobDisplay"); // NOVO
-    const editProfileBtn = document.getElementById("editProfileBtn"); // NOVO
+    const userDobDisplay = document.getElementById("userDobDisplay");
+    const userPobDisplay = document.getElementById("userPobDisplay");
+    const editProfileBtn = document.getElementById("editProfileBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
     // Edit Mode
-    const profileDisplayMode = document.getElementById("profileDisplayMode"); // NOVO
-    const profileEditMode = document.getElementById("profileEditMode");     // NOVO
-    const editNameInput = document.getElementById("editNameInput");       // NOVO
-    const editDobInput = document.getElementById("editDobInput");         // NOVO
-    const editPobInput = document.getElementById("editPobInput");         // NOVO
-    const saveProfileBtn = document.getElementById("saveProfileBtn");     // NOVO
-    const cancelEditBtn = document.getElementById("cancelEditBtn");       // NOVO
-    const editProfileStatus = document.getElementById("editProfileStatus"); // NOVO
+    const profileDisplayMode = document.getElementById("profileDisplayMode");
+    const profileEditMode = document.getElementById("profileEditMode");
+    const editNameInput = document.getElementById("editNameInput");
+    const editDobInput = document.getElementById("editDobInput");
+    const editPobInput = document.getElementById("editPobInput");
+    const saveProfileBtn = document.getElementById("saveProfileBtn");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+    const editProfileStatus = document.getElementById("editProfileStatus");
 
     const loadingMessage = document.getElementById("loadingMessage");
     const errorMessage = document.getElementById("errorMessage");
@@ -386,12 +373,12 @@
     const recordScreenTimeBtn = document.getElementById("recordScreenTimeBtn");
     const screenTimeStatus = document.getElementById("screenTimeStatus");
 
-    // Carteira de Documentos
-    const documentTypeSelect = document.getElementById("documentTypeSelect");
-    const documentUploadInput = document.getElementById("documentUploadInput");
-    const uploadDocumentBtn = document.getElementById("uploadDocumentBtn");
-    const uploadStatus = document.getElementById("uploadStatus");
-    const uploadedDocumentsList = document.getElementById("uploadedDocumentsList");
+    // Carteira de Documentos (variáveis comentadas para desabilitar funcionalidade)
+    // const documentTypeSelect = document.getElementById("documentTypeSelect");
+    // const documentUploadInput = document.getElementById("documentUploadInput");
+    // const uploadDocumentBtn = document.getElementById("uploadDocumentBtn");
+    // const uploadStatus = document.getElementById("uploadStatus");
+    // const uploadedDocumentsList = document.getElementById("uploadedDocumentsList");
 
     // Provas
     const proofOfLifeBtn = document.getElementById("proofOfLifeBtn");
@@ -418,7 +405,7 @@
     // Calcular dias vividos
     function calculateDaysLived(dateOfBirth) {
         if (!dateOfBirth) return 0;
-        const birthDate = dateOfBirth instanceof Date ? birthDate : new Date(dateOfBirth);
+        const birthDate = dateOfBirth instanceof Date ? dateOfBirth : new Date(dateOfBirth);
         const today = new Date();
         const diffTime = Math.abs(today.getTime() - birthDate.getTime());
         return Math.ceil(diffTime / MS_PER_DAY);
@@ -478,10 +465,10 @@
                 updateDigitalHourglassDisplay(userData);
             }
             
-            // Carregar e exibir documentos
-            loadUserDocuments(user.uid);
-
+            // loadUserDocuments(user.uid); // CHAMADA REMOVIDA/COMENTADA PARA DESABILITAR STORAGE
+            
         } else {
+            // Esta é a mensagem que você viu na imagem
             showPageErrorMessage("Dados do usuário não encontrados. Por favor, tente novamente ou entre em contato com o suporte.");
         }
     }
@@ -551,8 +538,6 @@
             if (newDob) {
                 updates.dateOfBirth = new Date(newDob);
             } else {
-                 // Se o campo for esvaziado, pode querer remover ou deixar como está
-                 // updates.dateOfBirth = null; // Para remover
                  if (currentUserData.dateOfBirth) updates.dateOfBirth = currentUserData.dateOfBirth; // Mantém o anterior se vazio
             }
 
@@ -560,7 +545,6 @@
             if (newPob) {
                 updates.placeOfBirth = newPob;
             } else {
-                // updates.placeOfBirth = null; // Para remover
                 if (currentUserData.placeOfBirth) updates.placeOfBirth = currentUserData.placeOfBirth; // Mantém o anterior se vazio
             }
             
@@ -627,7 +611,7 @@
         }
     });
 
-    // Função para registrar tempo de tela (continua igual)
+    // Função para registrar tempo de tela
     recordScreenTimeBtn.addEventListener("click", async () => {
         if (!currentUserData || !currentUserData.uid) {
             screenTimeStatus.innerText = "Erro: Usuário não logado.";
@@ -668,90 +652,18 @@
         }
     });
 
-    // Função para upload de documentos (continua igual)
+    // As funções de upload e carregamento de documentos estão comentadas para desabilitar o Storage
+    /*
     uploadDocumentBtn.addEventListener("click", async () => {
-        if (!currentUserData || !currentUserData.uid) {
-            uploadStatus.innerText = "Erro: Usuário não logado.";
-            return;
-        }
-
-        const file = documentUploadInput.files[0];
-        const documentType = documentTypeSelect.value;
-
-        if (!file) {
-            uploadStatus.innerText = "Por favor, selecione um arquivo.";
-            return;
-        }
-        if (!documentType) {
-            uploadStatus.innerText = "Por favor, selecione o tipo de documento.";
-            return;
-        }
-
-        uploadDocumentBtn.disabled = true;
-        uploadStatus.innerText = "Fazendo upload...";
-
-        try {
-            // Cria um caminho único no Storage
-            const storagePath = `users/${currentUserData.uid}/documents/${documentType}_${Date.now()}_${file.name}`;
-            const storageRef = ref(storage, storagePath);
-
-            // Faz o upload do arquivo
-            const snapshot = await uploadBytes(storageRef, file);
-            const downloadURL = await getDownloadURL(snapshot.ref);
-
-            // Salva os metadados no Firestore
-            const documentsCollectionRef = collection(db, "users", currentUserData.uid, "documents");
-            await setDoc(doc(documentsCollectionRef), { // Adiciona um novo documento com ID automático
-                type: documentType,
-                filename: file.name,
-                storagePath: storagePath,
-                downloadURL: downloadURL,
-                uploadDate: new Date(),
-                status: "Pendente" // Ou "Em Revisão", "Verificado", etc.
-            });
-
-            uploadStatus.innerText = "Documento enviado com sucesso!";
-            documentUploadInput.value = ""; // Limpa o input do arquivo
-            documentTypeSelect.value = ""; // Limpa o tipo selecionado
-            loadUserDocuments(currentUserData.uid); // Recarrega a lista de documentos
-        } catch (error) {
-            console.error("Erro ao fazer upload:", error);
-            uploadStatus.innerText = `Erro ao fazer upload: ${error.message}`;
-        } finally {
-            uploadDocumentBtn.disabled = false;
-        }
+        // Código de upload de documentos aqui
     });
 
-    // Função para carregar e exibir documentos do usuário (continua igual)
     async function loadUserDocuments(uid) {
-        uploadedDocumentsList.innerHTML = '<li>Carregando documentos... <span class="spinner"></span></li>';
-        const documentsCollectionRef = collection(db, "users", uid, "documents");
-        const q = query(documentsCollectionRef, orderBy("uploadDate", "desc"));
-
-        try {
-            const querySnapshot = await getDocs(q);
-            if (querySnapshot.empty) {
-                uploadedDocumentsList.innerHTML = '<li>Nenhum documento enviado ainda.</li>';
-                return;
-            }
-
-            uploadedDocumentsList.innerHTML = ''; // Limpa a lista
-            querySnapshot.forEach((doc) => {
-                const docData = doc.data();
-                const listItem = document.createElement("li");
-                listItem.innerHTML = `
-                    <span>${docData.type}: <a href="${docData.downloadURL}" target="_blank" rel="noopener noreferrer">${docData.filename}</a></span>
-                    <small>(${new Date(docData.uploadDate.toDate()).toLocaleDateString()}) - Status: ${docData.status}</small>
-                `;
-                uploadedDocumentsList.appendChild(listItem);
-            });
-        } catch (error) {
-            console.error("Erro ao carregar documentos:", error);
-            uploadedDocumentsList.innerHTML = '<li>Erro ao carregar documentos.</li>';
-        }
+        // Código de carregamento de documentos aqui
     }
+    */
 
-    // Função para Realizar Prova de Vida (continua igual)
+    // Função para Realizar Prova de Vida
     proofOfLifeBtn.addEventListener("click", async () => {
         if (!currentUserData || !currentUserData.uid) {
             proofOfLifeStatus.innerText = "Erro: Usuário não logado.";
